@@ -1,0 +1,528 @@
+---
+title: "PS2 Differential Abundance w/ DESeq2"
+output: html_notebook
+---
+
+This notebook was used to determine coarse-grained oxygen requirement assocation analysis. Before executing it, be sure to change the file paths in "File Import & Phyloseq Conversion" to reflect your own file paths. Some portions of the code have been commented out; optionally, you can un-comment them.
+
+
+```{r}
+library(phyloseq)
+library(genefilter)
+library(ggplot2)
+library(ggpubr)
+library(reshape2)
+library(RColorBrewer)
+library(viridis)
+library(wesanderson)
+library(grid)
+library(gridExtra)
+library(plotly)
+library(scales)
+library(dplyr)
+set.seed(1)
+```
+
+# File Import & Phyloseq Conversion
+```{r}
+# Import biom table, tree, and mapping:
+biom_file <- "/path/to/biom"
+tree_file <- "/path/to/tre"
+map_file <- "/path/to/mapping"
+
+
+biom_otu_tax <- import_biom(biom_file, tree_file, parseFunction=parse_taxonomy_default)
+biom_otu_tax
+```
+
+```{r}
+# Rename taxonomic levels
+colnames(tax_table(biom_otu_tax)) <- c(Rank1="Domain",Rank2="Phylum",Rank3="Class",Rank4="Order",Rank5="Family",Rank6="Genus",Rank7="Species")
+```
+
+```{r}
+# Add sample data to the dataset w/ merge
+bmsd <- import_qiime_sample_data(map_file)
+dim(bmsd)
+ps2 <- merge_phyloseq(biom_otu_tax, bmsd, tree_file)
+ps2
+```
+```{r}
+#  Remove the SILVA prefix "D_#__" from the taxonomy
+tax_table(ps2) <- gsub("D_[0-9]__","", tax_table(ps2)) # use gsub to remove
+#tax_table(ps2)[1:5, 1:7] # preview the edited taxons
+```
+```{r}
+# root the tree
+tree.unrooted <- phy_tree(ps2)
+pick_new_outgroup <- function(tree.unrooted){
+    require("magrittr")
+    require("data.table")
+    require("ape") # ape::Ntip
+    # tablify parts of tree that we need.
+    treeDT <- 
+      cbind(
+        data.table(tree.unrooted$edge),
+        data.table(length = tree.unrooted$edge.length)
+      )[1:Ntip(tree.unrooted)] %>% 
+      cbind(data.table(id = tree.unrooted$tip.label))
+    # Take the longest terminal branch as outgroup
+    new.outgroup <- treeDT[which.max(length)]$id
+    return(new.outgroup)
+  }
+new.outgroup = pick_new_outgroup(tree.unrooted)
+rootedTree = ape::root(tree.unrooted, outgroup=new.outgroup, resolve.root=TRUE)
+phy_tree(ps2) <- rootedTree
+phy_tree(ps2)
+```
+```{r}
+# PRE-PROCESSING
+
+# pre-filter the table to remove controls
+ps2.pf <- ps2
+ps2.pf <- subset_samples(ps2, Patient != "16")
+ps2.pf <- subset_samples(ps2.pf, SampleType %in% c("Pre-Debridement","Post-Debridement", "Skin"))
+flist <- filterfun(kOverA(5,10))
+ps2.pf <- filter_taxa(ps2.pf, flist, TRUE)
+ps2.pf = prune_taxa(taxa_sums(ps2.pf) >= 1, ps2.pf)
+```
+```{r}
+# add O2 requirements, agglomerate by categorization
+## start by extracting taxonomy
+o2tax <- tax_table(ps2.pf)
+o2tax <- data.frame(o2tax)
+o2tax
+```
+
+
+```{r}
+# assign o2 requirement
+#lists (updated - remove low abundance annotations)
+aerobes <- c("Corynebacterium 1", "Pseudomonas", "Sphingomonas", "Microbacterium", "Glutamicibacter", "Micrococcus", "Brevibacterium", "Hymenobacter", "Skermanella", "Nocardiodes", "Variovorax", "Stenotrophomonas", "Sphingopyxis", "Ralstonia", "Ornithinimicrobium", "Brachybacterium", "Staphylococcus", "Streptococcus", "Campylobacter", "Chryseobacterium","Agrococcus","Paucibacter","Ornithinimicrobium")
+
+anaerobes <- c("Anaerococcus", "Helcococcus", "Gallicola", "Peptoniphilus", "Propionibacterium", "Fastidiosipila", "Parvimonas", "Eubacterium coprostanoligenes group", "Porphyromonas","Bacteroides", "Peptoclostridium", "Dialister","Fastidiosipila")
+
+facs <- c("Actinotignum", "Actinomyces", "Enterobacter", "Serratia", "Aeromonas", "Salmonella", "Lactobacillus", "Proteus", "Escherichia-Shigella", "Enterococcus", "Propionibacterium", "Morganella","Cloacibacterium","Providencia", "Listeria")
+
+
+o2tax$respiration <- ifelse(o2tax$Genus %in% aerobes, "Aerobic",
+                            ifelse(o2tax$Genus %in% anaerobes, "Anaerobic",
+                                   ifelse(o2tax$Genus %in% facs, "Facultative", "Mixed")))
+
+o2tax
+```
+
+```{r}
+# replace add the O2 req. annotated tax table to phyloseq object
+o2tax.ss = o2tax[c("respiration","Genus")]
+o2tax.ss
+o2tax.ss <- as.matrix(o2tax.ss)
+tax_table(ps2.pf) <- o2tax.ss
+ps2.pf
+
+```
+```{r}
+# agglommerate taxa by o2 req, make a barplot to check
+ps2.pf.o2g <- tax_glom(ps2.pf, "respiration", NArm = FALSE)
+```
+```{r}
+# TAXONOMIC BARCHART - O2 req
+
+# Convert to relative abundance
+ra.tf.ps2 = transform_sample_counts(ps2.pf.o2g, function(x) x / sum(x) )
+ra.tf.ps2 = subset_samples(ra.tf.ps2, SampleType != "Skin")
+
+# HEALED
+healed.bp = subset_samples(ra.tf.ps2, Outcome == "Healed")
+# make a boxplot, sort by patient, stack pre-, post-, skin
+p2 = plot_bar(healed.bp, fill="respiration", facet_grid = "SampleType~.", x="Patient") + scale_fill_manual(values =                                                                           c("Aerobic" = "steelblue1",                                                        "Anaerobic" = "lightgreen", 
+                                        "Facultative" = "indianred1", 
+                                        "Mixed" = "gray95"), 
+                                        name = "Respiration") +
+ggtitle("Healed")
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+# facet order
+p2$data$SampleType <- as.character(p2$data$SampleType)
+p2$data$SampleType <- factor(p2$data$SampleType, levels=newSTorder)
+# x axis order
+#newPTorder = as.character(c(1:20))
+newPTorder = as.character(c(9,1,10,11,8,3,14,18))
+p2$data$Patient <- as.character(p2$data$Patient)
+p2$data$Patient <- factor(p2$data$Patient, levels=newPTorder)
+p2 + theme_bw()
+
+# UNHEALED
+healed.bp = subset_samples(ra.tf.ps2, Outcome == "Unhealed")
+# make a boxplot, sort by patient, stack pre-, post-, skin
+p3 = plot_bar(healed.bp, fill="respiration", facet_grid = "SampleType~.", x="Patient") + scale_fill_manual(values =                                                                           c("Aerobic" = "steelblue1",                                                        "Anaerobic" = "lightgreen", 
+                                        "Facultative" = "indianred1", 
+                                        "Mixed" = "gray95"), 
+                                        name = "Respiration") + 
+ggtitle("Unhealed")
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+# facet order
+p3$data$SampleType <- as.character(p3$data$SampleType)
+p3$data$SampleType <- factor(p3$data$SampleType, levels=newSTorder)
+# x axis order
+#newPTorder = as.character(c(1:20))
+newPTorder = as.character(c(15,7,20,19,4,2,17,18,13,12,6,5))
+p3$data$Patient <- as.character(p3$data$Patient)
+p3$data$Patient <- factor(p3$data$Patient, levels=newPTorder)
+p3 + theme_bw()
+
+# Print & save to file
+png("o2req.taxplot.draft.wlegend.png", width = 10, height = 6, units = "in", res = 600)
+grid.arrange(p2 + theme_bw(), p3 + theme_bw(), nrow = 1)
+dev.off()
+```
+```{r}
+# melt for the ggplot
+ttmelt <- psmelt(ra.tf.ps2)
+ttmelt
+```
+
+```{r}
+# % facultative vs. treatment time
+
+ttp1 <- ttmelt %>% 
+  filter(respiration == "Facultative") %>% 
+  ggplot(aes(x = TreatmentTime, y = Abundance, 
+             color = Outcome, shape = SampleType)) +
+  geom_point() + theme_bw() + ylab("Facultative relative abundance") + xlab("Treatment time (weeks)")
+ttp1
+ttp1$data
+png("fac.abund.by.time.png", height = 5, width = 5, units = "in", res = 600)
+ttp1
+dev.off()
+
+```
+
+#```{r}
+# Genus agglomeration (should this be tip_glom? idk anymore...)
+ps2.pf.gg <- tax_glom(ps2.pf, "Genus", NArm = FALSE)
+ps2.pf.ggra <- transform_sample_counts(ps2.pf.gg, function(x) (x / sum(x))*100 )
+
+# Pre-melt (Replace other indiv. melts w/ these)
+ps2.pf.gg.melt <- psmelt(ps2.pf.gg)
+ps2.pf.ggra.melt <- psmelt(ps2.pf.ggra)
+#```
+
+# DESeq Analyses
+```{r}
+# DESeq2 differential abundance analysis
+# Overall comparisons
+
+library(DESeq2)
+
+# These lines will produce the original DESeq2 object, and run the first comparison 
+# convert to DESeq2
+ps2.dds = phyloseq_to_deseq2(ps2.pf, ~ 1)
+# refactor levels for desired comparisons
+ps2.dds$SampleType <- factor(ps2.dds$SampleType, levels = c("Pre-Debridement","Post-Debridement","Skin"))
+# specify experiment design
+design(ps2.dds) <- ~ SampleType
+# run DESeq
+dds.out = DESeq(ps2.dds, test="Wald", fitType="parametric")
+
+# Pre vs. Skin Results
+res.ps = results(dds.out, contrast = c("SampleType","Pre-Debridement","Skin"), cooksCutoff = FALSE)
+write.csv(res.ps, "pre.vs.skin.csv")
+
+# Pre vs. Post Overall Results
+res.pp = results(dds.out, contrast = c("SampleType","Pre-Debridement","Post-Debridement"), cooksCutoff = FALSE)
+write.csv(res.pp, "pre.vs.post.overall.csv")
+
+# Wound (Pre + Post) vs. Skin DESeq & Results
+design(ps2.dds) <- ~ Description
+dds.out = DESeq(ps2.dds, test="Wald", fitType="parametric")
+res.ws = results(dds.out, contrast = c("Description","Wound","Skin"), cooksCutoff = FALSE)
+write.csv(res.ws, "wound.vs.skin.overall.csv")
+
+# Pre vs. Post HEALED ONLY DESeq & Results
+# Create nested group & run DESeq
+ps2.dds$group <- factor(paste0(ps2.dds$Outcome, ps2.dds$prepost))
+design(ps2.dds) <- ~ group
+dds.hu = DESeq(ps2.dds, test="Wald", fitType="parametric")
+res.hpp = results(dds.hu, contrast = c("group","HealedPre","HealedPost"), cooksCutoff = FALSE)
+write.csv(res.hpp, "pre.vs.post.healed.csv")
+
+# Healed vs. Unhealed (Post- Only) Results
+res.hupost = results(dds.hu, contrast = c("group","HealedPost","UnhealedPost"), cooksCutoff = FALSE)
+write.csv(res.hupost, "healed.vs.unhealed.post.csv")
+
+# Pre vs. Post UNHEALED ONLY DESeq & Results
+# Create nested group & run DESeq
+ps2.dds$group <- factor(paste0(ps2.dds$Outcome, ps2.dds$prepost))
+# Refactor to get desired comparisons
+ps2.dds$group <- factor(ps2.dds$group, levels = c("UnhealedPre","UnhealedPost","HealedPre","HealedPost","SkinControl"))
+design(ps2.dds) <- ~ group
+dds.hu = DESeq(ps2.dds, test="Wald", fitType="parametric")
+res.upp = results(dds.hu, contrast = c("group","UnhealedPre","UnhealedPost"), cooksCutoff = FALSE)
+write.csv(res.upp, "pre.vs.post.unhealed.csv")
+
+# Healed vs. Unhealed (Skin) DESeq & Results
+design(ps2.dds) <- ~ SkinOutcome
+dds.out = DESeq(ps2.dds, test="Wald", fitType="parametric")
+res.hu.skin = results(dds.out, contrast = c("SkinOutcome","Healed","Unhealed"), cooksCutoff = FALSE)
+write.csv(res.hu.skin, "healed.vs.unhealed.skin.csv")
+
+# Healed vs. Unhealed (Overall) DESeq & Results
+design(ps2.dds) <- ~ Outcome
+dds.out = DESeq(ps2.dds, test="Wald", fitType="parametric")
+res.hu = results(dds.out, contrast = c("Outcome","Healed","Unhealed"), cooksCutoff = FALSE)
+write.csv(res.hu, "healed.vs.unhealed.overall.csv")
+
+# Healed vs. Unhealed (Pre- Only) Results
+res.hupre = results(dds.hu, contrast = c("group","HealedPre","UnhealedPre"), cooksCutoff = FALSE)
+write.csv(res.hupre, "healed.vs.unhealed.pre.csv")
+```
+# Significant OTU Visualizations
+## Pre vs. Skin
+```{r}
+alpha = 0.05
+sigtab = res.ps[which(res.ps$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(ps2.pf)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+
+# Genus order
+x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+p1 <- ggplot(sigtab, aes(y=Genus, x=log2FoldChange, color=Phylum)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("pre.vs.skin.png", width = 6, height = 12, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Wounds (Pre + Post) vs. Skin
+```{r}
+alpha = 0.05
+sigtab = res.ws[which(res.ws$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(ps2.pf)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+
+# Genus order
+x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+p1 <- ggplot(sigtab, aes(y=Genus, x=log2FoldChange, color=Phylum)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("wound.vs.skin.overall.png", width = 6, height = 12, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Pre vs. Post (Overall)
+```{r}
+# Pre vs. Post Overall
+alpha = 1
+sigtab = res.pp[which(res.pp$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("pre.vs.post.overall.png", width = 6, height = 6, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Pre vs. Post (Healed Only)
+```{r}
+alpha = 1
+sigtab = res.hpp[which(res.hpp$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("pre.vs.post.healed.png", width = 6, height = 6, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Pre vs. Post (Unhealed Only)
+```{r}
+alpha = 1
+sigtab = res.upp[which(res.upp$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("pre.vs.post.unhealed.png", width = 6, height = 6, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Healed vs. Unhealed (Overall)
+```{r}
+# Healed vs. Unhealed Overall
+alpha = 0.05
+sigtab = res.hu[which(res.hu$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("healed.vs.unhealed.overall.png", width = 6, height = 6, units = "in", res = 600)
+p1
+dev.off()
+```
+# Healed vs Unhealed SKIN
+```{r}
+alpha = 0.05
+sigtab = res.hu.skin[which(res.hu.skin$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
+
+# Genus order
+x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+p1 <- ggplot(sigtab, aes(y=Genus, x=log2FoldChange, color=Phylum)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("healed.vs.unhealed.skin.png", width = 6, height = 6, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Healed vs. Unhealed (Pre- Only)
+```{r}
+# Healed vs. Unhealed Pre- only
+alpha = 0.05
+sigtab = res.hupre[which(res.hupre$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("healed.vs.unhealed.pre.png", width = 6, height = 12, units = "in", res = 600)
+p1
+dev.off()
+```
+
+## Healed vs Unhealed (Post- Only)
+```{r}
+# Healed vs. Unhealed Post- only
+alpha = 0.05
+sigtab = res.hupost[which(res.hupost$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"),
+as(tax_table(ps2.pf.o2g)[rownames(sigtab), ], "matrix"))
+head(sigtab)
+dim(sigtab)
+x = tapply(sigtab$log2FoldChange, sigtab$respiration, function(x) max(x))
+x = sort(x, TRUE)
+sigtab$respiration = factor(as.character(sigtab$respiration), levels=names(x))
+
+# Genus order
+#x = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x) max(x))
+#x = sort(x, TRUE)
+#sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x))
+
+# plot
+# 
+p1 <- ggplot(sigtab, aes(y=respiration, x=log2FoldChange, color=respiration)) + 
+  geom_point(size=4) + theme_bw()
+  #theme(axis.text.x = element_text(angle = -90, hjust = 0, vjust=0.5))
+p1
+png("healed.vs.unhealed.post.png", width = 6, height = 12, units = "in", res = 600)
+p1
+dev.off()
+```
+

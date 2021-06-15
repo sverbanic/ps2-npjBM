@@ -1,0 +1,463 @@
+OTU	Domain	Phylum	Class	Order	Family	Genus	Species
+New.CleanUp.ReferenceOTU74525	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+KJ890498.1.1488	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+CP001628.1564668.1566028	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+HQ323458.1.1504	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+HQ327111.1.1473	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Arthrobacter	NA
+JF313072.1.1494	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	NA	NA
+New.ReferenceOTU57	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+New.ReferenceOTU341	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Trueperella	uncultured bacterium
+FJ557974.1.1421	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+KF842633.1.1402	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+KF842558.1.1416	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+AYSG01000002.292.2076	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+JQ455220.1.1409	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	NA
+New.CleanUp.ReferenceOTU60648	Unassigned	NA	NA	NA	NA	NA	NA
+FJ983016.1.1511	Bacteria	Fusobacteria	Fusobacteriia	Fusobacteriales	Fusobacteriaceae	Fusobacterium	uncultured bacterium
+KF843576.1.1351	Bacteria	Fusobacteria	Fusobacteriia	Fusobacteriales	Leptotrichiaceae	Leptotrichia	uncultured bacterium
+New.ReferenceOTU1010	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.CleanUp.ReferenceOTU3964	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.CleanUp.ReferenceOTU37101	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+EF509307.1.1494	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+New.ReferenceOTU1	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+JN187532.1.1511	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+HQ876461.1.1511	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+JN867400.1.1515	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+FJ937929.1.1393	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+HQ448938.1.1500	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+GARB01003133.115.1632	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+GU179616.1.1393	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	Ambiguous_taxa
+New.CleanUp.ReferenceOTU37130	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	Ambiguous_taxa
+FJ900888.1.1397	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	Ambiguous_taxa
+GCZP01012221.1.1468	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+FN794244.1.1497	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+JN626198.1.1514	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+GQ258634.1.1318	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	uncultured bacterium
+New.ReferenceOTU213	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Ambiguous_taxa
+D14139.1.1375	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Ambiguous_taxa
+New.ReferenceOTU473	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Ambiguous_taxa
+HK555426.1.1506	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	NA
+New.CleanUp.ReferenceOTU105829	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU909	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	anaerobic digester metagenome
+New.ReferenceOTU882	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	NA
+New.ReferenceOTU83	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU1077	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU332	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU567	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Ambiguous_taxa
+New.CleanUp.ReferenceOTU71087	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Ambiguous_taxa
+New.ReferenceOTU1116	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU119	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU953	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU336	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU191	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU79766	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU18377	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU13672	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU821	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus prevotii
+ABXA01000039.540.2054	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	NA
+New.CleanUp.ReferenceOTU42898	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	NA
+New.ReferenceOTU37	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	NA
+New.ReferenceOTU1040	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+New.ReferenceOTU960	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+New.ReferenceOTU902	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+D14154.1.1375	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+New.ReferenceOTU200	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+New.ReferenceOTU466	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Anaerococcus	Anaerococcus lactolyticus
+AGEI01000004.3703.5220	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Helcococcus	uncultured bacterium
+ACKS01000100.344.1864	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Prevotellaceae	Prevotella 6	Ambiguous_taxa
+HK556770.9.1472	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Prevotellaceae	Prevotella 6	NA
+New.ReferenceOTU329	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU58	Unassigned	NA	NA	NA	NA	NA	NA
+FJ558013.1.1408	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Prevotellaceae	Prevotella 7	uncultured bacterium
+New.CleanUp.ReferenceOTU66862	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides	NA
+KF842135.1.1408	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides	uncultured bacterium
+GQ448744.1.1393	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides	uncultured bacterium
+DQ794196.1.1405	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	NA	NA	NA
+GQ448348.1.1394	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides	NA
+GQ448359.1.1396	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	NA	NA
+DQ808873.1.1403	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides	uncultured bacterium
+GQ492499.1.1357	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Parabacteroides	uncultured bacterium
+AB249372.1.1472	Bacteria	Bacteroidetes	Sphingobacteriia	Sphingobacteriales	Sphingobacteriaceae	Sphingobacterium	NA
+GAYX01056574.118.1534	Bacteria	Cyanobacteria	Chloroplast	NA	NA	NA	NA
+GABT01019963.848.2718	Bacteria	Cyanobacteria	Chloroplast	Ambiguous_taxa	Ambiguous_taxa	Ambiguous_taxa	Ambiguous_taxa
+GALZ01007484.194.1638	Bacteria	Cyanobacteria	Chloroplast	uncultured bacterium	uncultured bacterium	uncultured bacterium	uncultured bacterium
+GU272317.1.1456	Bacteria	Cyanobacteria	Chloroplast	uncultured bacterium	uncultured bacterium	uncultured bacterium	uncultured bacterium
+GU553025.1.1449	Bacteria	Cyanobacteria	Chloroplast	NA	NA	NA	NA
+JQ825174.1.1458	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Rhodospirillaceae	Skermanella	NA
+GU272299.1.1453	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Erythrobacteraceae	Altererythrobacter	uncultured alpha proteobacterium
+HQ118978.1.1385	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+New.ReferenceOTU749	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	NA	NA
+New.ReferenceOTU479	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+JN178118.1.1477	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	Ambiguous_taxa
+HM066409.1.1463	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	Ambiguous_taxa
+JN245722.1.1456	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	uncultured bacterium
+GQ340268.1.1348	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+New.ReferenceOTU665	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+JF766568.1.1454	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	Ambiguous_taxa
+JN178390.1.1481	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+KJ809335.1.1477	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingopyxis	uncultured bacterium
+HM066712.1.1464	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	uncultured bacterium
+New.ReferenceOTU820	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	uncultured bacterium
+KF712568.1.1452	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	NA	NA
+New.ReferenceOTU872	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+FN811195.1.1455	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Sphingomonadaceae	Sphingomonas	NA
+JN177839.1.1479	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Erythrobacteraceae	Altererythrobacter	uncultured bacterium
+EU328097.1.1450	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Erythrobacteraceae	Ambiguous_taxa	Ambiguous_taxa
+GQ472403.1.1419	Bacteria	Proteobacteria	Alphaproteobacteria	Sphingomonadales	Erythrobacteraceae	Altererythrobacter	NA
+KF842874.1.1392	Bacteria	Verrucomicrobia	Verrucomicrobiae	Verrucomicrobiales	Verrucomicrobiaceae	Akkermansia	uncultured bacterium
+New.ReferenceOTU944	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinotignum	NA
+AGWM01000009.146.1682	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinotignum	NA
+HK555333.1.1410	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	NA
+New.CleanUp.ReferenceOTU91788	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	NA
+New.CleanUp.ReferenceOTU29997	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	NA
+New.ReferenceOTU287	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU143	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU1013	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Kocuria	NA
+HE681228.1.1515	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Rothia	NA
+New.CleanUp.ReferenceOTU91025	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Kocuria	Ambiguous_taxa
+LDRI01000051.181.1719	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Kocuria	Ambiguous_taxa
+KF842545.1.1386	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Rothia	uncultured bacterium
+New.ReferenceOTU517	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Rothia	uncultured bacterium
+New.ReferenceOTU1016	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Kocuria	Ambiguous_taxa
+New.ReferenceOTU255	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Kocuria	Ambiguous_taxa
+New.ReferenceOTU878	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+KJ890494.1.1487	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Micrococcus	NA
+New.ReferenceOTU182	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.ReferenceOTU920	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.CleanUp.ReferenceOTU34340	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU251	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU16496	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU99	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU1081	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.CleanUp.ReferenceOTU65165	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU411	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU241	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU1063	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+CP001601.1487755.1489023	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Corynebacterium aurimucosum ATCC 700975
+New.ReferenceOTU508	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Corynebacterium aurimucosum ATCC 700975
+New.ReferenceOTU449	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU896	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	NA
+New.ReferenceOTU514	Unassigned	NA	NA	NA	NA	NA	NA
+FJ557790.1.1378	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.CleanUp.ReferenceOTU52948	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.ReferenceOTU499	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.ReferenceOTU818	Unassigned	NA	NA	NA	NA	NA	NA
+FJ557873.1.1382	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.ReferenceOTU366	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+New.ReferenceOTU649	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	NA	NA
+New.ReferenceOTU728	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	Ambiguous_taxa
+FJ671786.1.1387	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU480	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+JX290307.1.1514	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	uncultured bacterium
+New.ReferenceOTU905	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	NA
+New.ReferenceOTU833	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU967	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	NA	NA	NA
+New.ReferenceOTU874	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Corynebacteriaceae	Corynebacterium 1	NA
+New.ReferenceOTU209	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+New.CleanUp.ReferenceOTU74807	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+New.CleanUp.ReferenceOTU84464	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+HQ418457.1.1490	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+New.ReferenceOTU811	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+New.ReferenceOTU387	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Brevibacteriaceae	Brevibacterium	NA
+New.ReferenceOTU432	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	NA	NA	NA
+New.ReferenceOTU1006	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	NA	NA	NA
+New.ReferenceOTU340	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Glutamicibacter	NA
+New.ReferenceOTU90	Bacteria	Proteobacteria	Epsilonproteobacteria	Campylobacterales	Campylobacteraceae	Campylobacter	Ambiguous_taxa
+EU778942.1.1391	Bacteria	Firmicutes	Erysipelotrichia	Erysipelotrichales	Erysipelotrichaceae	Erysipelatoclostridium	NA
+New.CleanUp.ReferenceOTU3857	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Porphyromonas	Ambiguous_taxa
+HK556750.8.1516	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Porphyromonas	Ambiguous_taxa
+New.ReferenceOTU1079	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU547	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Porphyromonas	uncultured bacterium
+HK556755.1.1486	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Porphyromonas	NA
+New.ReferenceOTU895	Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Porphyromonadaceae	Porphyromonas	NA
+New.ReferenceOTU1110	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU117	Bacteria	Bacteroidetes	Flavobacteriia	Flavobacteriales	Flavobacteriaceae	NA	NA
+New.CleanUp.ReferenceOTU47803	Bacteria	Bacteroidetes	Flavobacteriia	Flavobacteriales	Flavobacteriaceae	Chryseobacterium	NA
+New.ReferenceOTU785	Bacteria	Bacteroidetes	Flavobacteriia	Flavobacteriales	Flavobacteriaceae	Chryseobacterium	Ambiguous_taxa
+New.CleanUp.ReferenceOTU67868	Bacteria	Bacteroidetes	Flavobacteriia	Flavobacteriales	Flavobacteriaceae	Chryseobacterium	Ambiguous_taxa
+AB546058.1.1480	Bacteria	Bacteroidetes	Flavobacteriia	Flavobacteriales	Flavobacteriaceae	Empedobacter	Ambiguous_taxa
+New.ReferenceOTU286	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Acetobacteraceae	Roseomonas	Ambiguous_taxa
+New.ReferenceOTU684	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Acetobacteraceae	Roseomonas	Ambiguous_taxa
+New.ReferenceOTU546	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Acetobacteraceae	Roseomonas	Ambiguous_taxa
+DQ532240.1.1472	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Acetobacteraceae	Roseomonas	NA
+New.CleanUp.ReferenceOTU35266	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Aurantimonadaceae	NA	NA
+GAON01156409.139.1558	Bacteria	Proteobacteria	Alphaproteobacteria	Rickettsiales	Mitochondria	NA	NA
+New.CleanUp.ReferenceOTU25360	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodospirillales	Rhodospirillaceae	uncultured	NA
+New.ReferenceOTU497	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Pantoea	Ambiguous_taxa
+GU553044.1.1341	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+KC283048.1.1543	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Pantoea	NA
+GDGZ01024135.295.1812	Bacteria	Proteobacteria	Gammaproteobacteria	Xanthomonadales	Xanthomonadaceae	Stenotrophomonas	uncultured bacterium
+GU563744.1.1502	Bacteria	Proteobacteria	Gammaproteobacteria	Xanthomonadales	Xanthomonadaceae	Stenotrophomonas	uncultured bacterium
+JALV01000036.3467.4991	Bacteria	Proteobacteria	Gammaproteobacteria	Xanthomonadales	Xanthomonadaceae	Stenotrophomonas	uncultured bacterium
+GU272313.1.1510	Bacteria	Proteobacteria	Gammaproteobacteria	Xanthomonadales	Xanthomonadaceae	NA	NA
+FJ940806.1.1506	Bacteria	Proteobacteria	Gammaproteobacteria	Aeromonadales	Aeromonadaceae	Aeromonas	uncultured bacterium
+JN626188.1.1506	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	Ambiguous_taxa
+New.CleanUp.ReferenceOTU69187	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+JF766379.1.1511	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Enterobacter	NA
+JN969338.1.1545	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+HM445996.1.1494	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Klebsiella	NA
+KF841934.1.1385	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Klebsiella	uncultured bacterium
+FM179752.1.1686	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Serratia	NA
+New.CleanUp.ReferenceOTU3940	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Serratia	uncultured bacterium
+JN695884.1.1564	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Serratia	uncultured bacterium
+KF906835.1.1540	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Serratia	NA
+New.CleanUp.ReferenceOTU39544	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+KC991107.1.1597	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+HQ883945.1.1551	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	Ambiguous_taxa
+GX182404.8.1529	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+GQ358914.1.1502	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+GQ491333.1.1396	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	Ambiguous_taxa
+GQ493993.1.1387	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	NA
+GQ503787.1.1505	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+GU906249.1.1413	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+JF513194.1.1517	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Ambiguous_taxa	Ambiguous_taxa
+New.CleanUp.ReferenceOTU62324	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+KF842917.1.1421	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	NA
+HQ883961.1.1547	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+HQ883931.1.1537	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+JF830192.1.1516	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Salmonella	NA
+KF928780.1.1519	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Salmonella	NA
+LECC01000011.1.1290	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Salmonella	Ambiguous_taxa
+New.ReferenceOTU180	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+LHTF01000009.1335.2930	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Salmonella	NA
+AOQH01000134.9789.11348	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	Ambiguous_taxa
+JF766389.1.1513	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Citrobacter	NA
+AOQK01000143.3212.4810	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	uncultured bacterium
+FJ906922.1.1481	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Enterobacter	NA
+KF842913.1.1420	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+KF906841.1.1487	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	NA	NA
+JUYT01000096.171.1693	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Proteus	NA
+New.ReferenceOTU686	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+New.ReferenceOTU130	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+AYLG01000126.503.2011	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Moraxella	Ambiguous_taxa
+GQ415379.1.1495	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+HQ860483.1.1449	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	NA
+JF830179.1.1509	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+AY563448.1.1496	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	Acinetobacter calcoaceticus
+HQ860754.1.1200	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+JX843606.1.1504	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	NA
+New.CleanUp.ReferenceOTU23865	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+New.ReferenceOTU943	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+AY773136.1.1509	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Acinetobacter	uncultured bacterium
+New.ReferenceOTU781	Bacteria	Proteobacteria	Gammaproteobacteria	Oceanospirillales	Halomonadaceae	Halomonas	Ambiguous_taxa
+New.CleanUp.ReferenceOTU81257	Bacteria	Proteobacteria	Gammaproteobacteria	Xanthomonadales	Xanthomonadales Incertae Sedis	Acidibacter	NA
+KF842066.1.1423	Bacteria	Proteobacteria	Gammaproteobacteria	Pasteurellales	Pasteurellaceae	Haemophilus	uncultured bacterium
+JN866570.1.1464	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Enhydrobacter	uncultured Enhydrobacter sp.
+AM111060.1.1503	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Psychrobacter	NA
+EU844911.1.1328	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae	Psychrobacter	Ambiguous_taxa
+JX097321.1.1494	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Helcococcus	uncultured bacterium
+New.ReferenceOTU901	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Helcococcus	uncultured bacterium
+HM036005.1.1486	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Helcococcus	uncultured bacterium
+New.ReferenceOTU350	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU314	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU931	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU21219	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU215	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU1080	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU161	Bacteria	Cyanobacteria	Cyanobacteria	SubsectionIV	FamilyI	NA	NA
+HQ739122.1.1450	Bacteria	Firmicutes	Negativicutes	Selenomonadales	Veillonellaceae	Veillonella	uncultured bacterium
+New.ReferenceOTU748	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU321	Bacteria	Firmicutes	Negativicutes	Selenomonadales	Veillonellaceae	Dialister	uncultured bacterium
+New.ReferenceOTU1019	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU1087	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU278	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	uncultured bacterium
+FJ557858.1.1386	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	uncultured bacterium
+New.ReferenceOTU1056	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	uncultured bacterium
+New.ReferenceOTU444	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	NA
+New.ReferenceOTU685	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	uncultured bacterium
+FJ557977.1.1384	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	NA
+New.ReferenceOTU789	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU86119	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU780	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU987	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU607	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	uncultured bacterium
+New.CleanUp.ReferenceOTU74328	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	NA
+CYUK01000003.1752625.1754089	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	NA
+D14153.1.1370	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	NA
+New.ReferenceOTU722	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	Ambiguous_taxa
+New.ReferenceOTU357	Unassigned	NA	NA	NA	NA	NA	NA
+JN837495.1.1476	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Peptoniphilus	Ambiguous_taxa
+New.ReferenceOTU1036	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Gallicola	uncultured bacterium
+New.ReferenceOTU544	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Murdochiella	Ambiguous_taxa
+New.CleanUp.ReferenceOTU30395	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Murdochiella	Ambiguous_taxa
+HM587324.1.1489	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XI	Murdochiella	Ambiguous_taxa
+New.ReferenceOTU354	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU302	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU358	Bacteria	Firmicutes	Clostridia	Clostridiales	Peptostreptococcaceae	Peptoclostridium	uncultured bacterium
+HM587320.1.1480	Bacteria	Firmicutes	Clostridia	Clostridiales	Family XIII	uncultured	Ambiguous_taxa
+KF842901.1.1378	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	[Ruminococcus] torques group	uncultured bacterium
+GQ491124.1.1360	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	[Ruminococcus] torques group	uncultured bacterium
+New.CleanUp.ReferenceOTU93306	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+DQ794499.1.1389	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+GQ491298.1.1331	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Lachnospiraceae ND3007 group	uncultured bacterium
+DQ793560.1.1388	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+DQ804527.1.1389	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Blautia	uncultured bacterium
+DQ796089.1.1390	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+FLKC01000026.136.1601	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Blautia	NA
+KF842622.1.1362	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+DQ793247.1.1384	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Lachnospiraceae UCG-008	uncultured bacterium
+KF841938.1.1366	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	NA	NA
+ADDS01000069.379.1898	Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Lachnoanaerobaculum	NA
+New.ReferenceOTU999	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU371	Unassigned	NA	NA	NA	NA	NA	NA
+DQ794506.1.1387	Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	[Eubacterium] coprostanoligenes group	uncultured bacterium
+JQ996667.1.1507	Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Faecalibacterium	uncultured bacterium
+KF842592.1.1369	Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Faecalibacterium	uncultured bacterium
+KF842051.1.1404	Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus 2	uncultured bacterium
+DQ490297.1.1494	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Burkholderiaceae	Burkholderia-Paraburkholderia	Ambiguous_taxa
+New.ReferenceOTU189	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	NA	NA
+EF648100.1.1506	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	NA	NA
+GU731299.1.1390	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	NA	NA
+JF697561.1.1506	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	NA	NA
+GU305772.1.1500	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	Variovorax	NA
+JF733429.1.1501	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	NA	NA
+GDHX01215805.4.1493	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Comamonadaceae	uncultured	NA
+EF511052.1.1484	Bacteria	Proteobacteria	Betaproteobacteria	Neisseriales	Neisseriaceae	Neisseria	uncultured bacterium
+New.CleanUp.ReferenceOTU10215	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU10576	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Burkholderiaceae	Ralstonia	Ambiguous_taxa
+HM445342.1.1490	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	NA
+KU515298.1.1494	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	uncultured bacterium
+New.CleanUp.ReferenceOTU107792	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	Ambiguous_taxa
+New.CleanUp.ReferenceOTU24716	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	Ambiguous_taxa
+FN563408.1.1215	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	NA
+New.CleanUp.ReferenceOTU12122	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	NA
+KF010693.1.1489	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	NA
+New.CleanUp.ReferenceOTU77888	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	Ambiguous_taxa
+GALO01006443.2.1478	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Massilia	Apis mellifera carnica (Carniolan honeybee)
+ACOR01000003.1451.2935	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Brucellaceae	NA	NA
+AJ879127.1.1445	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Rhizobiaceae	NA	NA
+ATYP01000111.391.1855	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Rhizobiaceae	Rhizobium	NA
+CP012945.1523999.1525460	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Hyphomicrobiaceae	Devosia	uncultured bacterium
+AB374388.1.1497	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Phyllobacteriaceae	Mesorhizobium	NA
+GU293227.1.1444	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Phyllobacteriaceae	Mesorhizobium	NA
+New.ReferenceOTU643	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Phyllobacteriaceae	Mesorhizobium	NA
+New.ReferenceOTU839	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Aurantimonadaceae	NA	NA
+JN685504.1.1473	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Rhizobiaceae	Rhizobium	uncultured bacterium
+GQ360006.1.1437	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Rhizobiaceae	Rhizobium	uncultured bacterium
+New.CleanUp.ReferenceOTU102324	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Phyllobacteriaceae	Mesorhizobium	NA
+AB636947.1.1425	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Rubellimicrobium	uncultured bacterium
+New.CleanUp.ReferenceOTU83835	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Rubellimicrobium	NA
+GBEF01033141.387.1869	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Paracoccus	NA
+JN082676.1.1481	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	NA	NA
+KF733619.1.1482	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Paracoccus	NA
+HQ728404.1.1491	Bacteria	Proteobacteria	Alphaproteobacteria	Rhodobacterales	Rhodobacteraceae	Paracoccus	Ambiguous_taxa
+HQ121123.1.1458	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Methylobacteriaceae	Microvirga	NA
+GU477345.1.1471	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Bradyrhizobiaceae	Bradyrhizobium	NA
+AF509582.1.1449	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Bradyrhizobiaceae	NA	NA
+GU455318.1.1451	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Bradyrhizobiaceae	Bradyrhizobium	NA
+GQ136604.1.1348	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Bradyrhizobiaceae	Bosea	uncultured bacterium
+AAAA02020712.626.2096	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Methylobacteriaceae	Methylobacterium	NA
+AB627071.1.1445	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Bradyrhizobiaceae	uncultured	NA
+KF010736.1.1445	Bacteria	Proteobacteria	Alphaproteobacteria	Rhizobiales	Methylobacteriaceae	Methylobacterium	Ambiguous_taxa
+JQ769625.1.1444	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	NA	NA
+EF600592.1.1339	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	uncultured bacterium
+New.ReferenceOTU158	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	uncultured bacterium
+HQ681994.1.1453	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	NA
+JN030530.1.1460	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	uncultured bacterium
+HQ682006.1.1451	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	NA
+FN668057.1.1443	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	Brevundimonas	uncultured bacterium
+HQ003516.1.1442	Bacteria	Proteobacteria	Alphaproteobacteria	Caulobacterales	Caulobacteraceae	uncultured	NA
+New.CleanUp.ReferenceOTU51275	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.CleanUp.ReferenceOTU59693	Bacteria	Proteobacteria	Betaproteobacteria	Burkholderiales	Oxalobacteraceae	Noviherbaspirillum	uncultured bacterium
+New.ReferenceOTU313	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+JN579972.1.1541	Bacteria	Firmicutes	Bacilli	Bacillales	Bacillaceae	Bacillus	Ambiguous_taxa
+CBVZ010000002.74463.76000	Bacteria	Firmicutes	Bacilli	Bacillales	Listeriaceae	Listeria	Ambiguous_taxa
+FJ957654.1.1486	Bacteria	Firmicutes	Bacilli	Bacillales	Bacillaceae	Bacillus	NA
+HK557047.45.1575	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+FJ832086.1.1515	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+JQ795732.1.1518	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.ReferenceOTU97	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+EF510348.1.1506	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.ReferenceOTU855	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.ReferenceOTU187	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+FJ957511.1.1474	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	uncultured bacterium
+FJ957564.1.1515	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+FJ957846.1.1474	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+DQ532350.1.1524	Bacteria	Firmicutes	Bacilli	Bacillales	NA	NA	NA
+FJ557934.1.1411	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	uncultured bacterium
+New.CleanUp.ReferenceOTU96084	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+JQ795730.1.1495	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.CleanUp.ReferenceOTU67929	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.CleanUp.ReferenceOTU46475	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+GQ175334.1.1521	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.CleanUp.ReferenceOTU22503	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.ReferenceOTU601	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+JX221937.1.1528	Bacteria	Firmicutes	Bacilli	Bacillales	Family XII	Exiguobacterium	uncultured bacterium
+New.ReferenceOTU250	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Nosocomiicoccus	Ambiguous_taxa
+CBUJ010000005.204.1751	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Lactococcus	uncultured bacterium
+AY422712.1.1545	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	Aerococcus	Ambiguous_taxa
+GQ175351.1.1519	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	Aerococcus	uncultured bacterium
+New.ReferenceOTU1083	Unassigned	NA	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU358	Bacteria	Firmicutes	Bacilli	Lactobacillales	Carnobacteriaceae	Atopostipes	uncultured bacterium
+New.ReferenceOTU85	Bacteria	Firmicutes	Bacilli	Lactobacillales	P5D1-392	Ambiguous_taxa	Ambiguous_taxa
+FR873975.1.1545	Bacteria	Firmicutes	Bacilli	Lactobacillales	Lactobacillaceae	Lactobacillus	Lactobacillus fermentum
+KM984489.1.1512	Bacteria	Firmicutes	Bacilli	Lactobacillales	Leuconostocaceae	Leuconostoc	NA
+JAHK01000002.1485485.1487033	Bacteria	Firmicutes	Bacilli	Lactobacillales	Enterococcaceae	Enterococcus	NA
+JN628990.1.1569	Bacteria	Firmicutes	Bacilli	Lactobacillales	Enterococcaceae	Enterococcus	NA
+New.ReferenceOTU619	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	Facklamia	uncultured bacterium
+New.ReferenceOTU772	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	Facklamia	uncultured bacterium
+New.ReferenceOTU6	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	uncultured	NA
+New.ReferenceOTU1062	Bacteria	Firmicutes	Bacilli	Lactobacillales	Aerococcaceae	Eremococcus	Ambiguous_taxa
+New.CleanUp.ReferenceOTU56384	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+GBKB01000906.322.1853	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+CSCC01000023.50.1885	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+LQCG01000007.381521.383064	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	Ambiguous_taxa
+New.ReferenceOTU590	Bacteria	Firmicutes	Bacilli	Bacillales	Staphylococcaceae	Staphylococcus	NA
+New.ReferenceOTU257	Bacteria	Proteobacteria	Gammaproteobacteria	Enterobacteriales	Enterobacteriaceae	Escherichia-Shigella	NA
+New.CleanUp.ReferenceOTU75841	Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas	NA
+New.CleanUp.ReferenceOTU74572	Bacteria	Firmicutes	Bacilli	Bacillales	Listeriaceae	Brochothrix	uncultured Brochothrix sp.
+JQ474924.1.1442	Bacteria	Firmicutes	Bacilli	Bacillales	Family XI	Gemella	uncultured bacterium
+GU361882.1.1515	Bacteria	Firmicutes	Bacilli	Bacillales	Family XI	Gemella	uncultured bacterium
+LC036219.1.1510	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	NA
+New.CleanUp.ReferenceOTU70655	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+JX548419.1.1509	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+JVEO01000014.1806.3342	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	NA
+New.CleanUp.ReferenceOTU90489	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	NA
+FJ983115.1.1241	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	uncultured bacterium
+JX548347.1.1509	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	Ambiguous_taxa
+New.ReferenceOTU217	Bacteria	Firmicutes	Bacilli	Lactobacillales	Streptococcaceae	Streptococcus	NA
+New.CleanUp.ReferenceOTU88953	Unassigned	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU694	Bacteria	Actinobacteria	Coriobacteriia	Coriobacteriales	Coriobacteriaceae	Atopobium	NA
+New.ReferenceOTU642	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Gulosibacter	NA
+FJ957443.1.1492	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Propionibacteriaceae	Propionibacterium	uncultured bacterium
+New.CleanUp.ReferenceOTU80843	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Propionibacteriaceae	Propionibacterium	uncultured bacterium
+New.ReferenceOTU586	Bacteria	Firmicutes	NA	NA	NA	NA	NA
+New.CleanUp.ReferenceOTU33229	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Propionibacteriaceae	Propionibacterium	uncultured bacterium
+New.ReferenceOTU617	Unassigned	NA	NA	NA	NA	NA	NA
+FJ470572.1.1360	Bacteria	NA	NA	NA	NA	NA	NA
+New.ReferenceOTU238	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Mobiluncus	Ambiguous_taxa
+CZPX01000003.3659.5189	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	Ambiguous_taxa
+AGWQ01000001.1612.3142	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	Ambiguous_taxa
+FJ470464.1.1525	Bacteria	Actinobacteria	Actinobacteria	Actinomycetales	Actinomycetaceae	Actinomyces	uncultured bacterium
+New.CleanUp.ReferenceOTU23731	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	Brachybacterium	Ambiguous_taxa
+HK555681.1.1458	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	Brachybacterium	Ambiguous_taxa
+New.ReferenceOTU674	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	NA	NA	NA
+New.ReferenceOTU253	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	Brachybacterium	Ambiguous_taxa
+New.ReferenceOTU133	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	NA	NA
+New.ReferenceOTU715	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	NA	NA
+New.ReferenceOTU240	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Dermabacteraceae	NA	NA
+New.ReferenceOTU1024	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Nocardiaceae	Gordonia	Ambiguous_taxa
+New.CleanUp.ReferenceOTU34196	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Dietziaceae	Dietzia	NA
+GBFX01069610.194.1692	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Nocardiaceae	Rhodococcus	Ambiguous_taxa
+New.ReferenceOTU697	Bacteria	Actinobacteria	Actinobacteria	Corynebacteriales	Nocardiaceae	Rhodococcus	Ambiguous_taxa
+HQ327216.1.1492	Bacteria	Actinobacteria	Actinobacteria	Frankiales	Geodermatophilaceae	NA	NA
+JN178097.1.1437	Bacteria	Actinobacteria	Actinobacteria	Frankiales	Geodermatophilaceae	NA	NA
+JN178846.1.1525	Bacteria	Actinobacteria	Actinobacteria	Frankiales	Geodermatophilaceae	Blastococcus	uncultured bacterium
+HQ538688.1.1501	Bacteria	Actinobacteria	Actinobacteria	Frankiales	Geodermatophilaceae	Blastococcus	uncultured bacterium
+New.ReferenceOTU131	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Nocardioidaceae	Nocardioides	NA
+KC820854.1.1430	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Nocardioidaceae	NA	NA
+DQ298283.1.1371	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Nocardioidaceae	NA	NA
+New.CleanUp.ReferenceOTU17896	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Propionibacteriaceae	Microlunatus	NA
+AUIB01000007.114179.115679	Bacteria	Actinobacteria	Actinobacteria	Propionibacteriales	Propionibacteriaceae	NA	NA
+New.ReferenceOTU799	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	NA	NA	NA
+New.CleanUp.ReferenceOTU32507	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	NA	NA
+JQ014308.13.1441	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Microbacterium	Ambiguous_taxa
+New.ReferenceOTU410	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Microbacterium	NA
+HM584364.1.1482	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Microbacterium	Ambiguous_taxa
+KJ890529.1.1486	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Microbacterium	uncultured bacterium
+JX515496.1.1486	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Microbacteriaceae	Microbacterium	uncultured bacterium
+New.ReferenceOTU26	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Intrasporangiaceae	Janibacter	NA
+New.CleanUp.ReferenceOTU74485	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Intrasporangiaceae	NA	NA
+New.ReferenceOTU568	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Intrasporangiaceae	NA	NA
+New.CleanUp.ReferenceOTU95937	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	NA	NA
+JN178087.1.1535	Bacteria	Actinobacteria	Actinobacteria	Micrococcales	Micrococcaceae	Arthrobacter	NA

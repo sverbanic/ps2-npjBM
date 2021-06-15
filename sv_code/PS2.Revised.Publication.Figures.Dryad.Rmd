@@ -1,0 +1,1861 @@
+---
+title: "Microbial predictors of healing and short-term effect of debridement on the microbiome of chronic wounds: the role of facultative anaerobes"
+output: html_notebook
+---
+
+This notebook contains code required to generate all figures in the manuscript, except for the taxonomic association figures and a couple taxonomic barcharts summarizing oxygen requirements (see the O2req DESeq2 notebook). Before executing the notebook, modify the file paths in the "File Import & Reformatting" section to reflect your own file paths. Chunk labels correspond to figure label(s) in the manuscript. Some code may be commented out.
+
+
+# Libraries
+```{r}
+# Load the required libraries
+library(phyloseq)
+library(genefilter)
+library(ggplot2)
+library(ggpubr)
+library(reshape2)
+library(RColorBrewer)
+library(viridis)
+library(wesanderson)
+library(grid)
+library(gridExtra)
+library(plotly)
+library(scales)
+library(dplyr)
+set.seed(1)
+```
+
+# File Import & Reformatting
+```{r}
+# Import biom table, tree, and mapping: MAC
+biom_file <- "/path/to/biom"
+tree_file <- "/path/to/tree"
+map_file <- "/path/to/map"
+
+biom_otu_tax <- import_biom(biom_file, tree_file, parseFunction=parse_taxonomy_default)
+
+# Rename taxonomic levels
+colnames(tax_table(biom_otu_tax)) <- c(Rank1="Domain",Rank2="Phylum",Rank3="Class",Rank4="Order",Rank5="Family",Rank6="Genus",Rank7="Species")
+
+# Add sample data to the dataset w/ merge
+bmsd <- import_qiime_sample_data(map_file)
+dim(bmsd)
+ps2 <- merge_phyloseq(biom_otu_tax, bmsd, tree_file)
+ps2
+```
+
+# Observational Metadata Reformatting
+```{r}
+#  Remove the SILVA prefix "D_#__" from the taxonomy
+tax_table(ps2) <- gsub("D_[0-9]__","", tax_table(ps2)) # use gsub to remove
+#tax_table(ps2)[1:5, 1:7] # preview the edited taxons
+
+# root the tree
+tree.unrooted <- phy_tree(ps2)
+pick_new_outgroup <- function(tree.unrooted){
+    require("magrittr")
+    require("data.table")
+    require("ape") # ape::Ntip
+    # tablify parts of tree that we need.
+    treeDT <- 
+      cbind(
+        data.table(tree.unrooted$edge),
+        data.table(length = tree.unrooted$edge.length)
+      )[1:Ntip(tree.unrooted)] %>% 
+      cbind(data.table(id = tree.unrooted$tip.label))
+    # Take the longest terminal branch as outgroup
+    new.outgroup <- treeDT[which.max(length)]$id
+    return(new.outgroup)
+  }
+new.outgroup = pick_new_outgroup(tree.unrooted)
+rootedTree = ape::root(tree.unrooted, outgroup=new.outgroup, resolve.root=TRUE)
+phy_tree(ps2) <- rootedTree
+phy_tree(ps2)
+```
+# Staphylococcus Species-Level Annotation
+```{r}
+# copy ps2 object
+ps2.stsp <- ps2
+
+# staph taxonomy table import & conversions
+tax_file <- "/path/to/staph.taxtable.forps.csv"
+ps2.stsp.taxin <- read.csv(tax_file, row.names = 1, check.names = FALSE, header = TRUE)
+ps2.staphonly <- subset_taxa(ps2, Genus == "Staphylococcus") # start by making a staph-only phyloseq object
+ps2.stsp.tax_table <- as.matrix(ps2.stsp.taxin) # import the staph tax table as matrix
+tax_table(ps2.staphonly) <- ps2.stsp.tax_table # replace staph-only pso tax_table w/ staph tax_table
+ps2.stsp.tax <- data.frame(tax_table(ps2.staphonly), stringsAsFactors = FALSE) # convert back to df
+
+# get ps2 tax table as data frame
+ps2.tax.temp <- data.frame(tax_table(ps2), stringsAsFactors = FALSE)
+
+# substitute staph genus w/ staph species
+ps2.tax.temp$Genus[row.names(ps2.tax.temp) %in% row.names(ps2.stsp.tax)] <- ps2.stsp.tax$Species
+
+# replace original with new tax table
+tax_table(ps2.stsp) <- as.matrix(ps2.tax.temp)
+```
+
+
+# Sample filtering, normalization, genus agglomeration, melting
+```{r}
+# PRE-PROCESSING
+
+# pre-filter the table to remove controls & patient 36/16
+ps2.pf <- subset_samples(ps2.stsp, Patient != "16")
+ps2.pf <- subset_samples(ps2.pf, SampleType %in% c("Pre-Debridement","Post-Debridement","Skin"))
+ps2.pf
+
+# repeat for original table
+ps2.pfog <- subset_samples(ps2, Patient != "16")
+ps2.pfog <- subset_samples(ps2.pfog, SampleType %in% c("Pre-Debridement","Post-Debridement","Skin"))
+ps2.pfog
+```
+
+
+
+
+```{r}
+# Genus agglomeration
+ps2.pf.gg <- tax_glom(ps2.pf, "Genus", NArm = FALSE)
+ps2.pf.ggra <- transform_sample_counts(ps2.pf.gg, function(x) (x / sum(x))*100 )
+
+# Pre-melt
+ps2.pf.gg.melt <- psmelt(ps2.pf.gg)
+ps2.pf.ggra.melt <- psmelt(ps2.pf.ggra)
+
+# repeat for original table
+# Genus agglomeration
+ps2.pfog.gg <- tax_glom(ps2.pfog, "Genus", NArm = FALSE)
+ps2.pfog.ggra <- transform_sample_counts(ps2.pfog.gg, function(x) (x / sum(x))*100 )
+
+# Pre-melt
+ps2.pfog.gg.melt <- psmelt(ps2.pfog.gg)
+ps2.pfog.ggra.melt <- psmelt(ps2.pfog.ggra)
+```
+
+
+# Figure 1A: Phylum Abundance Barchart
+```{r}
+# Agglomerate taxonomy by phylum, convert counts to relative abundance, convert to dataframe
+ps2.pglom <- tax_glom(ps2.pf, "Phylum")
+ra.pglom <- transform_sample_counts(ps2.pglom, function(x) (x / sum(x))*100 )
+ps2.pg.melt = psmelt(ra.pglom)
+
+# Calculate average relative abundance of each phylum, plot
+p1 <- ps2.pg.melt %>%
+  group_by(Phylum) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 0.2) %>%
+  ggplot(aes(x= reorder(Phylum, +mean.abundance), y = mean.abundance, fill = mean.abundance)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  scale_fill_gradientn(colours = c('gray','plum3','plum4')) +
+  #scale_fill_manual(values = wes_palette("Darjeeling1", type = "discrete")) +
+  theme_light() +
+  theme(legend.position="none", text = element_text(size=15)) +
+  xlab("Phylum") + ylab("Average Relative Abundance (%)")
+p1
+
+# Print & save to file
+png("avg.phylum.relabund.draft.png", width = 6, height = 4, units = "in", res = 600)
+p1
+dev.off()
+
+```
+
+# Taxonomic Stacked Barchart (Genus Level)
+## Filter to top 30 OTUs
+```{r}
+# filter to most abundant taxa
+ps2.gb <- ps2.pf.gg
+ps2.gb <- prune_taxa(names(sort(taxa_sums(ps2.gb),TRUE)[1:20]), ps2.gb)
+```
+## Plot
+
+```{r}
+# Convert to relative abundance
+ra.tf.ps2 = transform_sample_counts(ps2.gb, function(x) x / sum(x) )
+
+# Manually assign colors
+genus.colors = c(
+  "Staphylococcus aureus" = "firebrick3",
+  "Staphylococcus capitis" = "firebrick1",
+  "Corynebacterium 1" = "yellow1",
+  "Pseudomonas" = "olivedrab1",
+  "Staphylococcus hominis" = "indianred1",
+  "Enterobacter" = "dodgerblue",
+  "Proteus" = "mediumorchid1",
+  "Anaerococcus" = "royalblue3",
+  "Propionibacterium" = "purple1",
+  "Streptococcus" = "gray69",
+  "Campylobacter" = "yellow4",
+  "Escherichia-Shigella" = "darkorange1",
+  "Porphyromonas" = "darkgreen",
+  "Bacteroides" = "cyan1",
+  "Enhydrobacter" = "seagreen3",
+  "Peptoniphilus" = "tan3",
+  "Staphylococcus pettenkoferi" = "lightpink1",
+  "Micrococcus" = "mediumvioletred",
+  "Helcococcus" = "seagreen3",
+  "Kocuria" = "seashell2",
+  "Serratia" = "thistle2",
+  "Brevundimonas" = "powderblue"
+)
+
+
+# make a boxplot, sort by patient, stack pre-, post-, skin
+p2g = plot_bar(ra.tf.ps2, fill="Genus", facet_grid = "SampleType~.", x="Patient") + scale_fill_manual(values = genus.colors)
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+# facet order
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+p2g$data$SampleType <- as.character(p2g$data$SampleType)
+p2g$data$SampleType <- factor(p2g$data$SampleType, levels=newSTorder)
+# x-axis order
+newPTorder = as.character(c(1:20))
+p2g$data$Patient <- as.character(p2g$data$Patient)
+p2g$data$Patient <- factor(p2g$data$Patient, levels=newPTorder)
+
+p2gf = p2g + theme_bw() + theme(legend.position = "bottom",
+        text = element_text(size=20)) +
+  guides(fill = guide_legend(title = "Taxonomy", nrow=7))
+p2gf
+
+# Print & save to file
+png("staphsp.taxplot.wlegend.png", width = 10, height = 14, units = "in", res = 600)
+p2gf
+dev.off()
+
+```
+
+# Interactive Taxonomic Barchart
+```{r}
+# INTERACTIVE TAXPLOT
+# Transform genus-glommed table to relative abundances, filter
+ra.gg1pct.ps2 = filter_taxa(ps2.pf.ggra, function(x) mean(x) > 0.1, TRUE)
+
+set.seed(132)
+getPalette <- colorRampPalette(brewer.pal(26, "Set1"))
+#getPalette <- colorRampPalette(brewer.pal(22, "Spectral"))
+#getPalette <- colorRampPalette(brewer.pal(22, "Accent"))
+GenList <- unique(tax_table(ra.gg1pct.ps2)[,"Genus"])
+GenList <- sample(GenList)
+GenPalette = getPalette(length(GenList))
+names(GenPalette) = GenList
+
+
+# make a boxplot, sort by patient, stack pre-, post-, skin
+p2gi = plot_bar(ra.gg1pct.ps2, fill="Genus", facet_grid = "SampleType~.", x="Patient") + scale_fill_manual(values = GenPalette)
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+# facet order
+p2gi$data$SampleType <- as.character(p2gi$data$SampleType)
+p2gi$data$SampleType <- factor(p2gi$data$SampleType, levels=newSTorder)
+# x-axis order
+p2gi$data$Patient <- as.character(p2gi$data$Patient)
+p2gi$data$Patient <- factor(p2gi$data$Patient, levels=newPTorder)
+
+# convert to interactive
+ip1 <- ggplotly(p2gi + theme_bw())
+ip1
+
+# save as standalone html file
+htmlwidgets::saveWidget(as_widget(ip1), "interactive.genus.taxplot.html")
+
+```
+# Taxonomic 'Dotplot' by SampleType
+```{r}
+# TAXONOMIC 'DOTPLOT'
+
+# Plot grouped by SampleType
+# could consider coloring and grouping by higher level phylogeny
+
+p3 <- group_by(ps2.pf.ggra.melt, SampleType, Phylum, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 1) %>%
+  na.omit() %>%
+ggplot(aes(y=reorder(Genus, desc(Genus)), x=SampleType)) +
+  geom_point(aes(size = mean.abundance, color = Genus)) +
+  scale_color_viridis(discrete = TRUE, option = "plasma", guide = "none") +
+  scale_size_continuous(range = c(2,15),
+                        name = "Average Relative\nAbundance (%)") +
+  ylab('Genus') + xlab('Sample Type') +
+  theme_bw() +
+  theme(axis.text = element_text(size=10),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        axis.title=element_text(size=12),
+        legend.position = "right",
+        legend.title = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5))
+p3$data$SampleType <- as.character(p3$data$SampleType)
+p3$data$SampleType <- factor(p3$data$SampleType, levels=newSTorder)
+p3
+
+# Save & print to file
+png("taxa.dotplot.genus.draft.png", width = 6, height = 8, units = "in", res = 600)
+p3 + theme(text = element_text(size=15))
+dev.off()
+
+```
+# Taxonomic 'Dotplot' and RA Boxplots by Outcome
+```{r}
+# Taxa dotplot; wounds grouped by outcome
+
+# Dot plot grouped by outcome
+ps2.pf.ggra.melt %>% filter(SampleType != "Skin" & Outcome != "") %>% group_by(Phylum, Genus, Outcome) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 1) %>%
+  ggplot() +
+  geom_point(aes(y=Genus, x=Outcome,
+                 size = mean.abundance, color = Phylum)) +
+  scale_size_continuous(range = c(2,15)) +
+  theme_classic() + xlab("Outcome") +
+  theme(legend.position = "right") -> wo1
+wo1
+
+png("taxa.dotplot.outcome.draft.png", width = 5, height = 6, units = "in", res = 600)
+wo1
+dev.off()
+
+# boxplots
+
+wo2 <- ps2.pf.ggra.melt %>%
+  filter(SampleType != "Skin" & Outcome != "") %>%
+  group_by(Outcome, Genus) %>%
+  filter(Abundance > 1) %>%
+ggplot(aes(x= reorder(Genus, +Abundance), y = Abundance, fill = Outcome)) +
+  geom_point(stat='identity') +
+  geom_boxplot() +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Relative Abundance (%)") +
+  facet_wrap("Outcome", nrow=1)
+
+wo2
+
+# Print & save to file
+png("outcome.genus.histos.draft.png", width = 6, height = 10, units = "in", res = 600)
+wo2
+dev.off()
+
+wo3 <- ps2.pf.ggra.melt %>%
+  filter(SampleType != "Skin" & Outcome != "") %>%
+  group_by(Outcome, SampleType, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 0.5) %>%
+  ggplot(aes(x= reorder(Genus, +mean.abundance), y = mean.abundance, fill = Outcome)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Average Relative Abundance (%)") +
+  facet_wrap(Outcome ~ SampleType)
+wo3
+
+```
+# Average RA Histograms by Sample Type, Genus Level
+```{r}
+# AVERAGE RELATIVE ABUNDANCE HISTOS - SAMPLE TYPE, GENUS LEVEL
+# Calculate average relative abundance of each phylum, plot
+test.sp1 <- ps2.pf.ggra.melt %>%
+  group_by(SampleType, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 1) %>%
+  ggplot(aes(x= reorder(Genus, +mean.abundance), y = mean.abundance, fill = SampleType)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Average Relative Abundance (%)") +
+  facet_wrap("SampleType", nrow=1)
+test.sp1$data$SampleType <- as.character(test.sp1$data$SampleType)
+test.sp1$data$SampleType <- factor(test.sp1$data$SampleType, levels=newSTorder)
+
+
+test.sp1
+
+# Print & save to file
+png("avg.sampletype.genus.histos.draft.png", width = 6, height = 5, units = "in", res = 600)
+test.sp1
+dev.off()
+
+```
+## Boxplot verison
+```{r}
+# BOX PLOT VERSION OF ^^
+test.sp2 <- ps2.pf.ggra.melt %>%
+  group_by(SampleType, Genus) %>%
+  filter(Abundance > 1) %>%
+ggplot(aes(x= reorder(Genus, +Abundance), y = Abundance, fill = SampleType)) +
+  geom_point(stat='identity') +
+  geom_boxplot() +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Relative Abundance (%)") +
+  facet_wrap("SampleType", nrow=1)
+test.sp2$data$SampleType <- as.character(test.sp2$data$SampleType)
+test.sp2$data$SampleType <- factor(test.sp2$data$SampleType, levels=newSTorder)
+
+
+test.sp2
+
+# Print & save to file
+png("sampletype.genus.boxplots.draft.png", width = 6, height = 8, units = "in", res = 600)
+test.sp2
+dev.off()
+```
+# Top 300 OTU Heatmap
+
+```{r}
+# TOP 300 OTU HEATMAP
+
+# Prune to top 300 OTUs,  convert to relative abundance
+hmf.ps2 <- ps2.pf
+hmf.ps2 <- prune_taxa(names(sort(taxa_sums(hmf.ps2),TRUE)[1:300]), hmf.ps2)
+hmf.ps2.ra <- transform_sample_counts(hmf.ps2, function(x) (x / sum(x))*100 )
+hmf.ps2.ra.melt <- psmelt(hmf.ps2.ra)
+my_breaks = c(0.001, 0.01, 0.1, 1, 10, 50)
+p4 = ggplot(hmf.ps2.ra.melt, aes(x = Patient, 
+                                       y = reorder(OTU, Abundance))) +
+              geom_tile(aes(fill = Abundance)) + 
+              scale_fill_gradient(trans = "log",
+                                  name = "Relative\nAbundance (%)",
+                                  breaks = my_breaks,
+                                  labels = my_breaks,
+                                  na.value = "black") +
+              facet_wrap("SampleType~.", nrow = 1, ncol = 3, 
+                scales = "free") + ylab("OTU") +
+              theme(axis.text.y=element_blank(), 
+                  axis.ticks.y=element_blank(),
+                  panel.spacing.x = unit(0, "lines"),
+                  axis.text.x = element_text(angle = 90, 
+                                             hjust = 1, vjust = 0.5))
+p4$data$SampleType <- as.character(p4$data$SampleType)
+p4$data$SampleType <- factor(p4$data$SampleType, levels=newSTorder)
+p4$data$Patient <- as.character(p4$data$Patient)
+p4$data$Patient <- factor(p4$data$Patient, levels=newPTorder)
+p4
+# Print & save to file
+png("ra.heatmap.draft.png", width = 8, height = 6, units = "in", res = 600)
+p4
+dev.off()
+```
+
+# Alpha Diversity Plots by Sample Type
+```{r}
+# Plot
+p5 = plot_richness(ps2.pf, x="SampleType", measures=c("Chao1", "Shannon"))
+
+# # Fix X-axis order
+newSTorder = c("Pre-Debridement","Post-Debridement","Skin")
+p5$data$SampleType <- as.character(p5$data$SampleType)
+p5$data$SampleType <- factor(p5$data$SampleType, levels=newSTorder)
+
+# comparisons
+alpha.comps = list(c("Pre-Debridement", "Post-Debridement"), c("Pre-Debridement", "Skin"), c("Post-Debridement", "Skin"))
+
+# Plot with aesthetics and stats
+alpha.div = p5 + theme_bw() + 
+  theme(axis.text.x = element_text(angle=90, hjust=1, vjust = 0.5),
+        legend.position = "none") +
+  #stat_compare_means(method = "wilcox.test", alternative = "two.sided",
+  #                   comparisons = alpha.comps, paired = TRUE,
+  #                   aes(group = SampleType, label = ..p.adj..)) +
+  geom_line(aes(group=Patient), colour="grey", alpha = 0.5) + xlab("Sample
+                                                                   Type")
+
+a.comp = compare_means(value ~ SampleType, alpha.div$data, method = "wilcox.test",
+                       paired = TRUE, group.by = "variable", alternative =
+                         "two.sided")
+a.comp
+library(rstatix)
+a.comp <- a.comp %>% add_y_position()
+alpha.div = alpha.div + stat_pvalue_manual(a.comp, label = "p.adj")
+
+
+
+# Print
+ad = alpha.div + geom_point(aes(color = SampleType)) +
+  scale_color_manual(values = wes_palette("Moonrise3", 3, type = "discrete")) 
+ad.box = alpha.div + geom_boxplot(aes(fill = SampleType)) + scale_fill_manual(values = wes_palette("Moonrise3", 3, type = "discrete"), name = "Sample Type")
+ad
+ad.box
+
+
+# Save to file
+png("alpha.div.draft.png", width = 5, height = 5, units = "in", res= 600)
+alpha.div
+dev.off()
+png("alpha.div.draft.wbox.png", width = 5, height = 5, units = "in", res= 600)
+ad.box
+dev.off()
+```
+# Alpha Diversity Plots by Outcome
+```{r}
+# ALPHA DIV - healed vs. unhealed
+
+# Remove Skin samples
+hvu.ss <- subset_samples(ps2.pf, Outcome != "Skin")
+
+# Plot
+tp5 = plot_richness(hvu.ss, x="Outcome", color = "SampleType", measures=c("Chao1", "Shannon"))
+
+# comparisons
+alpha.comps = list(c("Healed", "Unhealed"))
+
+# Plot with aesthetics and stats
+hvu.alpha.div = tp5 + theme_bw() + 
+  theme(axis.text.x = element_text(angle=90, hjust=1, vjust = 0.5),
+        text = element_text(size=15)) + 
+  stat_compare_means(method = "wilcox.test", alternative = "two-sided", comparisons = alpha.comps, 
+                     aes(group = Outcome, label = ..p.adj..)) +
+  scale_color_manual(values = wes_palette("Darjeeling1", 2, type = "discrete"), name = "Sample Type")
+
+# Print
+hvu.alpha.div
+
+# Save to file
+png("alpha.div.OUTCOME.draft.png", width = 5, height = 5, units = "in", res= 600)
+hvu.alpha.div
+dev.off()
+```
+# Beta Diversity Ordinations
+## Bray NMDS
+```{r}
+# BETA ORDINATIONS
+
+# Filter out any OTU w/ less than 0.01% RA in 5 samples
+flist <- filterfun(kOverA(5,0.01))
+ps2.p5 <- filter_taxa(ps2.pfog.ggra, flist, TRUE)
+
+
+# Ordination 1: NMDS BRAY ordination
+ps2bray.ord <- ordinate(ps2.p5, "NMDS", "bray")
+p6 = plot_ordination(ps2.p5, ps2bray.ord, type="samples", color="SampleType", shape = "WoundType") + 
+  scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Sample Type") + 
+  scale_shape(name = "Wound Type")
+p6$data$SampleType <- as.character(p6$data$SampleType)
+p6$data$SampleType <- factor(p6$data$SampleType, levels=newSTorder)
+p6l <- p6 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Bray-Curtis NMDS") + theme_bw()
+p6l
+```
+
+## Unweighted UniFrac PCoA
+```{r}
+# Ordination 2: Unweighted UniFrac PCoA
+
+# try phylogenetic distance measures, start unweighted
+ordu.uw = ordinate(ps2.p5, "PCoA", "unifrac", weighted=FALSE)
+p7 = plot_ordination(ps2.p5, ordu.uw, color="SampleType", shape = "WoundType") + scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Sample Type") + scale_shape(name = "Wound Type")
+p7$data$SampleType <- as.character(p7$data$SampleType)
+p7$data$SampleType <- factor(p7$data$SampleType, levels=newSTorder)
+p7l <- p7 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Unweighted UniFrac PCoA") + theme_bw()
+p7l
+
+```
+## Weighted UniFrac PCoA
+```{r}
+# Ordination 3: Weighted UniFrac PCoA
+
+# try phylogenetic distance measures, weighted now
+ordu.w = ordinate(ps2.p5, "PCoA", "unifrac", weighted=TRUE)
+p8 = plot_ordination(ps2.p5, ordu.w, color="SampleType", shape = "WoundType") + scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Sample Type") + 
+  scale_shape(name = "Wound Type")
+p8$data$SampleType <- as.character(p8$data$SampleType)
+p8$data$SampleType <- factor(p8$data$SampleType, levels=newSTorder)
+p8l <- p8 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Weighted UniFrac PCoA") + theme_bw()
+p8l
+```
+## Oridnation figure generation
+```{r}
+# horizontal grid print of all 3 ords
+png("all.ord.horiz.png", width = 15, height = 4, units = "in", res = 600)
+grid.arrange(p6l, p7l, p8l, ncol=3)
+dev.off()
+```
+# Beta Diversity Ordination by Outcome
+```{r}
+# ORD BY OUTCOME
+# Bray
+ps2bray.ord <- ordinate(ps2.p5, "NMDS", "bray")
+p6 = plot_ordination(ps2.p5, ps2bray.ord, type="samples", color="Outcome", shape = "WoundType") + 
+  scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Outcome") + 
+  scale_shape(name = "Wound Type")
+outorder = c("Unhealed","Healed","Skin")
+p6$data$Outcome <- as.character(p6$data$Outcome)
+p6$data$Outcome <- factor(p6$data$Outcome, levels=outorder)
+p6l <- p6 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Bray-Curtis NMDS") + theme_bw()
+p6l
+
+# Unweighted UniFrac
+ordu.uw = ordinate(ps2.p5, "PCoA", "unifrac", weighted=FALSE)
+p7 = plot_ordination(ps2.p5, ordu.uw, color="Outcome", shape = "WoundType") + scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Outcome") + scale_shape(name = "Wound Type")
+p7$data$Outcome <- as.character(p7$data$Outcome)
+p7$data$Outcome <- factor(p7$data$Outcome, levels=outorder)
+p7l <- p7 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Unweighted UniFrac PCoA") + theme_bw()
+p7l
+
+# Weighted UniFrac
+ordu.w = ordinate(ps2.p5, "PCoA", "unifrac", weighted=TRUE)
+p8 = plot_ordination(ps2.p5, ordu.w, color="Outcome", shape = "WoundType") + scale_color_manual(values = wes_palette("Darjeeling1", 3, type = "discrete"), name = "Outcome") + 
+  scale_shape(name = "Wound Type")
+p8$data$Outcome <- as.character(p8$data$Outcome)
+p8$data$Outcome <- factor(p8$data$Outcome, levels=outorder)
+p8l <- p8 + geom_line(aes(group=Pre.Post), colour="black") + geom_point(size=1.5) + ggtitle("Weighted UniFrac PCoA") + theme_bw()
+p8l
+
+# horizontal grid print of all 3 ords
+png("all.ord.horiz.OUTCOME.png", width = 15, height = 4, units = "in", res = 600)
+grid.arrange(p6l, p7l, p8l, ncol=3)
+dev.off()
+```
+# Ordination Cluster Analysis
+
+```{r}
+# ORDINATION CLUSTER ANALYSIS
+# calculate partitioning around medoids (PAM) and facet ordinations
+library(cluster)
+library(phyloseq)
+
+BCdist = distance(ps2.pf, "bray")
+bray.pcoa = ordinate(ps2.p5, "NMDS", BCdist)
+plot_scree(bray.pcoa)
+plot_ordination(ps2.p5, bray.pcoa, color = 'SampleType', shape = 'WoundType')
+
+# BRAY-CURTIS
+# bray hclust
+hclustavg<-hclust(BCdist,method= "average")
+plot(hclustavg, hang=-1, main="AverageLinkage")
+rect.hclust(hclustavg,k =3)
+
+# bray pam
+pamClust3=pam(BCdist,k=3, cluster.only=T)
+sample_data(ps2.p5)$pam3<-factor(pamClust3)
+plot_ordination(ps2.p5, bray.pcoa, color ="SampleType")+
+facet_wrap(~pam3, nrow =1)
+p6l$data$pam3<-factor(pamClust3)
+p6l
+p6l + facet_wrap(~pam3, nrow =1)
+
+# UNWEIGHTED UNIFRAC
+# uw uni hclust
+uw.dist = distance(ps2.p5, "unifrac")
+hclustavg<-hclust(uw.dist, method= "average")
+plot(hclustavg, hang=-1, main="AverageLinkage")
+rect.hclust(hclustavg,k =4)
+
+# uw uni pam
+pamClust3=pam(uw.dist, k=4, cluster.only=T)
+sample_data(ps2.p5)$pam3<-factor(pamClust3)
+plot_ordination(ps2.p5, ordu.uw, color ="SampleType")+
+facet_wrap(~pam3, nrow =1)
+p7l$data$pam3<-factor(pamClust3)
+p7l
+p7l + facet_wrap(~pam3, nrow =2)
+
+# WEIGHTED UNIFRAC
+# w uni hclust
+w.dist = distance(ps2.p5, "wunifrac")
+hclustavg<-hclust(w.dist, method= "average")
+plot(hclustavg, hang=-1, main="AverageLinkage")
+rect.hclust(hclustavg,k =6)
+
+# w uni pam
+pamClust3=pam(w.dist,k=6, cluster.only=T)
+sample_data(ps2.p5)$pam3<-factor(pamClust3)
+plot_ordination(ps2.p5, ordu.w, color ="SampleType")+
+facet_wrap(~pam3, nrow =1)
+p8l$data$pam3<-factor(pamClust3)
+p8l
+p8l + facet_wrap(~pam3, nrow =2)
+```
+
+## Gap Statistics
+```{r}
+# CLUSTER ANALYSIS CONT'D
+# get gap statistics for each
+plot_scree(ps2bray.ord)
+gs = gapstat_ord(ps2bray.ord, axes=c(1:2))
+plot_clusgap(gs)
+print(gs, method="Tibs2001SEmax")
+
+plot_scree(ordu.uw)
+gs = gapstat_ord(ordu.uw, axes=c(1:2))
+plot_clusgap(gs)
+print(gs, method="Tibs2001SEmax")
+
+plot_scree(ordu.w)
+gs = gapstat_ord(ordu.w, axes=c(1:3))
+plot_clusgap(gs)
+print(gs, method="Tibs2001SEmax")
+
+```
+
+## PerMANOVAs
+```{r}
+# CLUSTER(?) ANALYSIS CONT'D
+# PerMANOVA tests across sample types (this tests correlation of multiple variables)
+library(vegan)
+#ent <-subset_samples(ent,!is.na(Enterotype))
+
+df = data.frame(sample_data(ps2.p5))
+BC = distance(ps2.p5, "bray")
+adonis(BC~ Location + Outcome , data=df)
+```
+
+# Pairwise Beta Diversity Boxplots by Sample Type
+```{r}
+# Pairewise Beta diversity plots (separated by metric)
+plotDistances = function(p = ps2.p5, b = "bray", u = "unifrac", w = "wunifrac", s = "SampleID", d = "SampleType", g = "Patient") {
+
+  # calc weighted unifrac distances
+  bc = phyloseq::distance(p, b)
+  bc.m = melt(as.matrix(bc))
+  # calc weighted unifrac distances
+  wu = phyloseq::distance(p, w)
+  wu.m = melt(as.matrix(wu))
+  # calc unweighted unifrac distances
+  uw = phyloseq::distance(p, u)
+  uw.m = melt(as.matrix(uw))
+  
+  # remove self-comparisons
+    # bray
+    bc.m = bc.m %>%
+      filter(as.character(Var1) != as.character(Var2)) %>%
+      mutate_if(is.factor,as.character)
+    # weighted
+    wu.m = wu.m %>%
+      filter(as.character(Var1) != as.character(Var2)) %>%
+      mutate_if(is.factor,as.character)
+    # unweighted
+    uw.m = uw.m %>%
+      filter(as.character(Var1) != as.character(Var2)) %>%
+      mutate_if(is.factor,as.character)
+  
+  # get sample data (S4 error OK and expected)
+  sd = sample_data(p) %>%
+    select(s, d, g) %>%
+    mutate_if(is.factor,as.character)
+  
+  # combined distances with sample data
+    # Var1
+    colnames(sd) = c("Var1", "Type1", "Patient1")
+      # bray
+      bc.sd = left_join(bc.m, sd, by = "Var1")
+      # weighted
+      wu.sd = left_join(wu.m, sd, by = "Var1")
+      # unweighted
+      uw.sd = left_join(uw.m, sd, by = "Var1")
+    # Var2
+    colnames(sd) = c("Var2", "Type2", "Patient2")
+      # bray
+      bc.sd = left_join(bc.sd, sd, by = "Var2")
+      # weighted
+      wu.sd = left_join(wu.sd, sd, by = "Var2")
+      # unweighted
+      uw.sd = left_join(uw.sd, sd, by = "Var2")
+  
+  # Filter to get only within-patient comparisons
+  # bray
+  bc.sd = bc.sd %>%
+    filter(as.character(Patient1) == as.character(Patient2)) %>%
+    mutate_if(is.factor,as.character)
+  # weighted
+  wu.sd = wu.sd %>%
+    filter(as.character(Patient1) == as.character(Patient2)) %>%
+    mutate_if(is.factor,as.character)
+  # unweighted
+  uw.sd = uw.sd %>%
+    filter(as.character(Patient1) == as.character(Patient2)) %>%
+    mutate_if(is.factor,as.character)
+  
+  # Label comparison types
+  # bray
+  bc.sd$comps = 
+    ifelse(bc.sd$Type1 == "Pre-Debridement" & 
+           bc.sd$Type2 == "Post-Debridement", "Pre vs. Post", 
+    ifelse(bc.sd$Type1 == "Pre-Debridement" & 
+           bc.sd$Type2 == "Skin", "Pre vs. Skin",
+    ifelse(bc.sd$Type1 == "Post-Debridement" & 
+           bc.sd$Type2 == "Skin", "Post vs. Skin", NA)))
+  bc.sd = bc.sd %>% filter(as.character(comps) != "NA")
+  
+  # weighted
+  wu.sd$comps = 
+    ifelse(wu.sd$Type1 == "Pre-Debridement" & 
+           wu.sd$Type2 == "Post-Debridement", "Pre vs. Post", 
+    ifelse(wu.sd$Type1 == "Pre-Debridement" & 
+           wu.sd$Type2 == "Skin", "Pre vs. Skin",
+    ifelse(wu.sd$Type1 == "Post-Debridement" & 
+           wu.sd$Type2 == "Skin", "Post vs. Skin", NA)))
+  wu.sd = wu.sd %>% filter(as.character(comps) != "NA")
+  
+  # unweighted
+  uw.sd$comps = 
+    ifelse(uw.sd$Type1 == "Pre-Debridement" &
+           uw.sd$Type2 == "Post-Debridement", "Pre vs. Post",
+    ifelse(uw.sd$Type1 == "Pre-Debridement" &
+           uw.sd$Type2 == "Skin", "Pre vs. Skin",
+    ifelse(uw.sd$Type1 == "Post-Debridement" &
+           uw.sd$Type2 == "Skin", "Post vs. Skin", NA)))
+  uw.sd = uw.sd %>% filter(as.character(comps) != "NA")
+  
+  # plot
+bcp1 <- ggplot(bc.sd, aes(x = comps, y = value)) +
+    theme_bw() +
+    geom_point() +
+    geom_line(aes(group=Patient1), colour="grey", alpha = 0.5) +
+    geom_boxplot(aes(fill=comps)) +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5),
+          legend.position = "none") + 
+    ggtitle("Bray-Curtis")
+  
+wup1 <- ggplot(wu.sd, aes(x = comps, y = value)) +
+    theme_bw() +
+    geom_point() +
+    geom_line(aes(group=Patient1), colour="grey", alpha = 0.5) +
+    geom_boxplot(aes(fill=comps)) +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5),
+          legend.position = "none") + 
+    ggtitle("Weighted UniFrac")
+
+uwp1 <- ggplot(uw.sd, aes(x = comps, y = value)) +
+    theme_bw() +
+    geom_point() +
+    geom_line(aes(group=Patient1), colour="grey", alpha = 0.5) +
+    geom_boxplot(aes(fill=comps)) +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5),
+          legend.position = "none") + 
+    ggtitle("Unweighted UniFrac")
+
+# fix sample order
+newCorder = c("Pre vs. Skin","Pre vs. Post","Post vs. Skin")
+bcp1$data$comps <- as.character(bcp1$data$comps)
+bcp1$data$comps <- factor(bcp1$data$comps, levels=newCorder)
+wup1$data$comps <- as.character(wup1$data$comps)
+wup1$data$comps <- factor(wup1$data$comps, levels=newCorder)
+uwp1$data$comps <- as.character(uwp1$data$comps)
+uwp1$data$comps <- factor(uwp1$data$comps, levels=newCorder)
+
+# define stat comparisons
+beta.comps = list(c("Pre vs. Post", "Pre vs. Skin"), c("Pre vs. Post", "Post vs. Skin"), c("Pre vs. Skin", "Post vs. Skin"))
+beta.groups = c(u,w)
+
+# print with stats
+bcps = bcp1 + 
+  stat_compare_means(method = "wilcox.test", alternative = "two.sided", comparisons = beta.comps, paired = TRUE, step.increase = 0.15, aes(label = ..p.adj..)) + 
+  ylab("Distance") + ylim(0,1.4) +
+  xlab("Comparison") + 
+  scale_fill_manual(values = wes_palette("Moonrise3", 3, type = "discrete"))
+wups = wup1 + 
+  stat_compare_means(method = "wilcox.test", alternative = "two.sided", comparisons = beta.comps, paired = TRUE, step.increase = 0.15, aes(label = ..p.adj..)) + 
+  ylab("Distance") + ylim(0,1.15) +
+  xlab("Comparison") + 
+  scale_fill_manual(values = wes_palette("Moonrise3", 3, type = "discrete"))
+uwps = uwp1 + 
+  stat_compare_means(method = "wilcox.test", alternative = "two.sided", comparisons = beta.comps, paired = TRUE, step.increase = 0.15, aes(label = ..p.adj..)) + 
+  ylab("Distance") + ylim(0,1.15) +
+  xlab("Comparison") +
+  scale_fill_manual(values = wes_palette("Moonrise3", 3, type = "discrete"))
+grid.arrange(bcps, uwps, wups, ncol = 3)
+
+# collect mean & sd for each plot
+b.mean <- group_by(bcp1$data, comps) %>% summarise(b.mean = mean(value))
+b.sd <- group_by(bcp1$data, comps) %>% summarise(b.sd = sd(value))
+b.stat = left_join(b.mean, b.sd)
+
+w.mean <- group_by(wup1$data, comps) %>% summarise(w.mean = mean(value))
+w.sd <- group_by(wup1$data, comps) %>% summarise(w.sd = sd(value))
+w.stat = left_join(w.mean, w.sd)
+
+u.mean <- group_by(uwp1$data, comps) %>% summarise(u.mean = mean(value))
+u.sd <- group_by(uwp1$data, comps) %>% summarise(u.sd = sd(value))
+u.stat = left_join(u.mean, u.sd)
+
+uw.stat = left_join(u.stat, w.stat)
+uwb.stat = left_join(uw.stat, b.stat)
+uwb.stat
+
+}
+plotDistances()
+
+
+png("beta.diversity.boxplots.draft.png", width = 9, height = 4, units = "in", res = 600)
+plotDistances()
+dev.off()
+```
+
+# Beta Diversity Boxplots - Wounds vs. Skin by Outcome
+```{r}
+# BETA DIV BOXPLOTS - Wound vs. Skin by Outcome
+
+plotDistances = function(p = ps2.p5, u = "unifrac", w = "wunifrac", s = "SampleID", d = "SampleType", g = "Patient", o = "Outcome") {
+
+  # calc weighted unifrac distances
+  wu = phyloseq::distance(p, w)
+  wu.m = melt(as.matrix(wu))
+  # calc unweighted unifrac distances
+  uw = phyloseq::distance(p, u)
+  uw.m = melt(as.matrix(uw))
+  
+  # remove self-comparisons
+    # weighted
+    wu.m = wu.m %>%
+      filter(as.character(Var1) != as.character(Var2)) %>%
+      mutate_if(is.factor,as.character)
+    # unweighted
+    uw.m = uw.m %>%
+      filter(as.character(Var1) != as.character(Var2)) %>%
+      mutate_if(is.factor,as.character)
+  
+  # get sample data (S4 error OK and expected)
+  sd = sample_data(p) %>%
+    select(s, d, g, o) %>%
+    mutate_if(is.factor,as.character)
+  
+  # combined distances with sample data
+    # Var1
+    colnames(sd) = c("Var1", "Type1", "Patient1", "Outcome1")
+      # weighted
+      wu.sd = left_join(wu.m, sd, by = "Var1")
+      # unweighted
+      uw.sd = left_join(uw.m, sd, by = "Var1")
+    # Var2
+    colnames(sd) = c("Var2", "Type2", "Patient2", "Outcome2")
+      # weighted
+      wu.sd = left_join(wu.sd, sd, by = "Var2")
+      # unweighted
+      uw.sd = left_join(uw.sd, sd, by = "Var2")
+  
+  # Filter to get only within-patient comparisons
+  # weighted
+  wu.sd = wu.sd %>%
+    filter(as.character(Patient1) == as.character(Patient2)) %>%
+    mutate_if(is.factor,as.character)
+  # unweighted
+  uw.sd = uw.sd %>%
+    filter(as.character(Patient1) == as.character(Patient2)) %>%
+    mutate_if(is.factor,as.character)
+  
+  # Filter to remove NA outcomes
+  wu.sd = wu.sd %>%
+    filter(as.character(Outcome1) != "") %>% mutate_if(is.factor,as.character)
+  uw.sd = uw.sd %>%
+    filter(as.character(Outcome1) != "") %>% mutate_if(is.factor,as.character)
+  
+  # Label comparison types
+  # weighted
+  wu.sd$comps = 
+    ifelse(wu.sd$Type1 == "Pre-Debridement" & 
+           wu.sd$Type2 == "Post-Debridement", "Pre vs. Post", 
+    ifelse(wu.sd$Type1 == "Pre-Debridement" & 
+           wu.sd$Type2 == "Skin", "Pre vs. Skin",
+    ifelse(wu.sd$Type1 == "Post-Debridement" & 
+           wu.sd$Type2 == "Skin", "Post vs. Skin", NA)))
+  wu.sd = wu.sd %>% filter(as.character(comps) != "NA")
+  
+  # unweighted
+  uw.sd$comps = 
+    ifelse(uw.sd$Type1 == "Pre-Debridement" &
+           uw.sd$Type2 == "Post-Debridement", "Pre vs. Post",
+    ifelse(uw.sd$Type1 == "Pre-Debridement" &
+           uw.sd$Type2 == "Skin", "Pre vs. Skin",
+    ifelse(uw.sd$Type1 == "Post-Debridement" &
+           uw.sd$Type2 == "Skin", "Post vs. Skin", NA)))
+  uw.sd = uw.sd %>% filter(as.character(comps) != "NA")
+  
+  # plot
+wup1 <- ggplot(wu.sd, aes(x = comps, y = value)) +
+    theme_bw() +
+    geom_point(position=position_dodge(width=0.75), aes(group = Outcome1)) +
+    geom_boxplot(aes(fill=Outcome1)) +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5),
+          legend.position = "bottom") + 
+    ggtitle("Weighted UniFrac")
+
+uwp1 <- ggplot(uw.sd, aes(x = comps, y = value)) +
+    theme_bw() +
+    geom_point(position=position_dodge(width=0.75), aes(group = Outcome1)) +
+    geom_boxplot(aes(fill=Outcome1)) +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5),
+          legend.position = "bottom") +
+    ggtitle("Unweighted UniFrac")
+
+# fix sample order
+newCorder = c("Pre vs. Skin","Pre vs. Post","Post vs. Skin")
+wup1$data$comps <- as.character(wup1$data$comps)
+wup1$data$comps <- factor(wup1$data$comps, levels=newCorder)
+uwp1$data$comps <- as.character(uwp1$data$comps)
+uwp1$data$comps <- factor(uwp1$data$comps, levels=newCorder)
+
+# define stat comparisons
+#beta.comps = list("Healed","Unhealed")
+#beta.groups = c(u,w)
+
+# print with stats
+wups = wup1 + 
+  stat_compare_means(aes(group=Outcome1), method = "wilcox.test", alternative = "two.sided", label = "p.signif", label.y.npc = 1) +
+  ylab("Distance") +
+  xlab("Comparison") + ylim(0,0.9) +
+  scale_fill_manual(values = wes_palette("Royal1", 3, type = "discrete"), name = "Outcome") + 
+  theme(text = element_text(size=15))
+
+uwps = uwp1 + 
+  stat_compare_means(aes(group=Outcome1), method = "wilcox.test", alternative = "two.sided", label = "p.signif", label.y.npc = 1) +
+  ylab("Distance") +
+  xlab("Comparison") + ylim(0,0.9) +
+  scale_fill_manual(values = wes_palette("Royal1", 3, type = "discrete"), name = "Outcome") +
+  theme(text = element_text(size=15))
+
+grid.arrange(uwps, wups, ncol = 2)
+
+}
+
+plotDistances()
+
+png("bd.by.outcome.boxplots.draft.png", width = 8, height = 5, units = "in", res = 600)
+plotDistances()
+dev.off()
+```
+# Control Figures
+## Taxonomy
+```{r}
+# Subset samples to only plot controls
+ps2.con <- subset_samples(ps2, SampleType %in% c("Negative_Control", "Microbial_Standard"))
+
+
+# TAXONOMIC BARCHART
+# Filter by # of most abundant taxa
+ta20.ps2.con <- tax_glom(ps2.con, "Genus", NArm = FALSE)
+ta20.ps2.con <- prune_taxa(names(sort(taxa_sums(ta20.ps2.con),TRUE)[1:20]), ta20.ps2.con)
+
+# Convert to relative abundance
+ra.tf.ps2.con = transform_sample_counts(ta20.ps2.con, function(x) x / sum(x) )
+
+#assign specific colors to specific Family 
+set.seed(132)
+getPalette <- colorRampPalette(brewer.pal(50, "Set1"))
+ConFamList <- unique(tax_table(ra.tf.ps2.con)[,"Genus"])
+ConFamList <- sample(ConFamList)
+ConFamPalette = getPalette(length(ConFamList))
+names(ConFamPalette) = ConFamList
+
+# make a boxplot
+sp1 = plot_bar(ra.tf.ps2.con, fill="Genus", x="SampleID") + scale_fill_manual(values = ConFamPalette)
+sp1 + theme_bw()
+
+
+# Print & save to file
+png("controls.taxplot.png", width = 10, height = 6, units = "in", res = 600)
+sp1 + theme_bw()
+dev.off()
+```
+## Positive Control Only: Expected vs. Observed
+```{r}
+# Enter mock community info (from Zymo)
+mock.genera = c("Pseudomonas", "Escherichia-Shigella", "Salmonella", "Lactobacillus", "Enterococcus", "Staphylococcus", "Listeria", "Bacillus")
+RAbundance = c(4.2, 10.1, 10.4, 18.4, 9.9, 15.5, 14.1, 17.4)
+# build into dataframe
+pos.comp <- data.frame(mock.genera, RAbundance)
+colnames(pos.comp)[1] <- "Genus"
+pos.comp$Sample[1:8] <- "Expected"
+
+# prepare microbial standard data
+## Subset
+poscon <- subset_samples(ra.tf.ps2.con, SampleType == "Microbial_Standard")
+## melt
+posmelt <- psmelt(poscon)
+## average the samples and filter to include only taxa in mock community
+pos.avg <- posmelt %>% group_by(Genus) %>% summarise(RAbundance = (mean(Abundance))*100) %>% filter(Genus %in% mock.genera)
+pos.avg$Sample[1:8] <- "Observed"
+
+# combine tables
+pos.comp = rbind(pos.comp, pos.avg)
+pos.comp
+
+# plot
+pcp1 <- pos.comp %>% 
+  group_by(Sample, Genus) %>%
+  ggplot(aes(x=Sample, y=RAbundance, fill = Genus)) +
+  geom_bar(stat="identity") +
+  theme_bw() + ylab("Average Relative Abundance (%)") + 
+  theme(legend.position = "right", axis.title.x = element_blank()) +
+  scale_fill_brewer(palette = "Set1", name = "Genus")
+pcp1
+
+png("positive.control.comp.png", width = 5, height = 5, units = "in", res = 600)
+pcp1
+dev.off()
+
+```
+
+
+## Alpha Diversity
+```{r}
+# CONTROL FIGURES 
+# Alpha div
+
+# Calculate & plot alpha diversity
+sp2 = plot_richness(ps2.con, x="SampleType", measures=c("Chao1","Shannon"))
+alpha.div = sp2 + theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust = 0.5))
+sp2
+
+# Print & save to file
+png("control.alpha.div.draft.png", width = 7, height = 5, units = "in", res= 600)
+sp2
+dev.off()
+```
+
+# Binary (Shared/Unique) OTU analysis
+## Pre vs. Post
+```{r}
+# Shared/Unique OTUs b/w Pre- and Post-
+prepost.overlap <- psmelt(ps2.p5)
+
+
+# remove skin
+prepost.overlap <- filter(prepost.overlap, SampleType != "Skin")
+# remove empty abundances
+prepost.overlap <- filter(prepost.overlap, Abundance != 0)
+# Calc overlap
+prepost.overlap <- prepost.overlap %>% 
+  group_by(OTU, Patient) %>% 
+  mutate(overlap = ifelse(n() > 1, "Shared", "Unique"))
+prepost.overlap
+
+su.box.genus <- prepost.overlap %>%
+  group_by(overlap, Genus) %>%
+  filter(Abundance > 0.1) %>%
+ggplot(aes(x= reorder(Genus, +Abundance), y = Abundance, fill = overlap)) +
+  geom_point(stat='identity') +
+  geom_boxplot() +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Relative Abundance (%)") +
+  facet_wrap("overlap", nrow=1)
+su.box.genus
+
+su.boxave.genus <- prepost.overlap %>%
+  group_by(overlap, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = F)) %>%
+  filter(mean.abundance > 0.1) %>%
+ggplot(aes(x= reorder(Genus, +mean.abundance), y = mean.abundance, fill = overlap)) +
+  geom_bar(stat='identity')+
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Average Relative Abundance (%)") +
+  facet_wrap("overlap", nrow=1)
+su.boxave.genus
+
+png("overlap.prepost.genus.boxave.png", width = 6, height = 10, units = "in", res = 600)
+su.boxave.genus
+dev.off()
+
+```
+### Counts & Proportions
+```{r}
+# counts and proportions of shared/unique taxa
+
+# COUNTS - we want to plot pre-only, post-only, and shared
+# process the data to re-label as pre-only, post-only or shared
+prepost.overlap$unique = 
+    ifelse(prepost.overlap$overlap == "Shared", "Shared", 
+    ifelse(prepost.overlap$SampleType == "Pre-Debridement" & 
+           prepost.overlap$overlap == "Unique", "Pre-debridement Only",
+    ifelse(prepost.overlap$SampleType == "Post-Debridement" & 
+           prepost.overlap$overlap == "Unique", "Post-debridement Only", NA)))
+
+# Counts plot
+su.counts <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique) %>%
+  summarise(counts = n()) %>%
+  ggplot(aes(x=unique, y=counts, fill = unique)) +
+  geom_point(stat='identity', position=position_dodge(width=0.75), aes(group = unique)) +
+  geom_line(aes(group=Patient), colour="grey", alpha = 0.5) +
+  geom_boxplot() +
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping") +
+  theme_bw() + ylab("OTU Count") + xlab("OTU Grouping") +
+  theme(text = element_text(size=15))
+
+newUTorder = c("Pre-debridement Only","Shared","Post-debridement Only")
+su.counts$data$unique <- as.character(su.counts$data$unique)
+su.counts$data$unique <- factor(su.counts$data$unique, levels=newUTorder)
+
+su.counts + theme(legend.position = "none")
+
+
+# proportion
+su.prop <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=unique, y=proportion, fill = unique)) +
+  geom_point(stat='identity', position=position_dodge(width=0.75), aes(group = unique)) +
+  geom_line(aes(group=Patient), colour="grey", alpha = 0.5) +
+  geom_boxplot() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() + ylab("Relative Abundance") +
+  theme(text = element_text(size=15))
+
+su.prop$data$unique <- as.character(su.prop$data$unique)
+su.prop$data$unique <- factor(su.prop$data$unique, levels=newUTorder)
+su.prop
+
+su.prop.bar <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=Patient, y=proportion, fill = unique)) +
+  geom_bar(stat="identity") + facet_grid(SampleType~.) +
+  theme_bw() + ylab("Relative Abundance") +
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping")
+su.prop.bar$data$Patient <- as.character(su.prop.bar$data$Patient)
+su.prop.bar$data$Patient <- factor(su.prop.bar$data$Patient, levels=newPTorder)
+su.prop.bar$data$unique <- as.character(su.prop.bar$data$unique)
+su.prop.bar$data$unique <- factor(su.prop.bar$data$unique, levels=newUTorder)
+su.prop.bar$data$SampleType <- as.character(su.prop.bar$data$SampleType)
+su.prop.bar$data$SampleType <- factor(su.prop.bar$data$SampleType, levels=newSTorder)
+su.prop.bar
+
+su.boxave.genus <- prepost.overlap %>%
+  group_by(SampleType, unique, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = F)) %>%
+  filter(mean.abundance > 0.1) %>%
+ggplot(aes(x= reorder(Genus, +mean.abundance), y = mean.abundance, fill = unique)) +
+  geom_bar(stat='identity')+
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Average Relative Abundance (%)") +
+  facet_wrap("unique", nrow=1)
+su.boxave.genus
+
+su.box.genus <- prepost.overlap %>%
+  group_by(unique, Genus) %>%
+  filter(Abundance > 0.1) %>%
+ggplot(aes(x= reorder(Genus, +Abundance), y = Abundance, fill = unique)) +
+  geom_point(stat='identity') +
+  geom_boxplot() +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Relative Abundance (%)") +
+  facet_wrap("unique", nrow=1)
+su.box.genus
+
+png("overlap.prepost.counts.png", width = 6, height = 6, units = "in", res = 600)
+su.counts + theme(legend.position = "none")
+dev.off()
+
+png("overlap.prepost.genus.png", width = 15, height = 12, units = "in", res = 600)
+su.boxave.genus
+dev.off()
+
+png("overlap.prepost.genus.box.png", width = 15, height = 12, units = "in", res = 600)
+su.box.genus
+dev.off()
+
+png("overlap.prepost.summary.png", width = 12, height = 5, units = "in", res = 600)
+grid.arrange(su.counts, su.prop.bar, nrow =1, ncol = 2)
+dev.off()
+```
+## Binary comparison - O2 Requirements
+
+```{r}
+# this is the average cummulative RA stacked bar of pre-post exclusive RAs in terms of oxygen requirement
+
+
+
+# assign o2 requirement
+#lists (updated - remove low abundance annotations)
+aerobes <- c("Corynebacterium 1", "Pseudomonas", "Sphingomonas", "Microbacterium", "Glutamicibacter", "Micrococcus", "Brevibacterium", "Hymenobacter", "Skermanella", "Nocardiodes", "Variovorax", "Stenotrophomonas", "Sphingopyxis", "Ralstonia", "Ornithinimicrobium", "Brachybacterium", "Staphylococcus", "Streptococcus", "Campylobacter", "Chryseobacterium","Agrococcus","Paucibacter","Ornithinimicrobium")
+anaerobes <- c("Anaerococcus", "Helcococcus", "Gallicola", "Peptoniphilus", "Propionibacterium", "Fastidiosipila", "Parvimonas", "Eubacterium coprostanoligenes group", "Porphyromonas","Bacteroides", "Peptoclostridium", "Dialister","Fastidiosipila")
+facs <- c("Actinotignum", "Actinomyces", "Enterobacter", "Serratia", "Aeromonas", "Salmonella", "Lactobacillus", "Proteus", "Escherichia-Shigella", "Enterococcus", "Propionibacterium", "Morganella","Cloacibacterium","Providencia", "Listeria")
+
+
+prepost.overlap$respiration <- ifelse(prepost.overlap$Genus %in% aerobes, "Aerobic",
+                            ifelse(prepost.overlap$Genus %in% anaerobes, "Anaerobic",
+                                   ifelse(prepost.overlap$Genus %in% facs, "Facultative", NA)))
+
+o2respal <- wes_palettes$Zissou1
+
+ppo.res <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique, respiration) %>%
+  filter(respiration != "NA") %>%
+  summarise(proportion = sum(Abundance)) %>%
+  group_by(SampleType, unique, respiration) %>%
+  summarise(mean = mean(proportion)) %>%
+  filter(unique != "Shared") %>%
+  ggplot(aes(x=SampleType, y=mean, fill = respiration)) +
+  geom_bar(stat="identity") +
+  theme_bw() + ylab("Average Relative Abundance (%)") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  scale_fill_manual(values = o2respal[c(1,3,5)], name = "Respiration")
+ppo.res$data$SampleType <- as.character(ppo.res$data$SampleType)
+ppo.res$data$SampleType <- factor(ppo.res$data$SampleType, levels=newSTorder)
+ppo.res
+png("overlap.pp.o2req.box.png", width = 6, height = 6, units = "in", res = 600)
+ppo.res
+dev.off()
+ppo.res$data
+
+# pre- vs. post- stats for proportion of o2 requirements
+o2.prop.mean <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique, respiration) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  group_by(unique, respiration) %>%
+  summarise(mean = mean(proportion))
+  
+o2.prop.sd <- prepost.overlap %>% 
+  group_by(Patient, SampleType, unique, respiration, Genus) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  group_by(unique, respiration) %>%
+  summarise(sd = sd(proportion))
+o2.prop.stat = left_join(o2.prop.mean, o2.prop.sd)
+o2.prop.stat
+
+# test
+o2req <- filter(ps2.pf.ggra.melt, SampleType != "Skin")
+o2req$respiration <- ifelse(o2req$Genus %in% aerobes, "Aerobic",
+                            ifelse(o2req$Genus %in% anaerobes, "Anaerobic",
+                                   ifelse(o2req$Genus %in% facs, "Facultative", NA)))
+o2.allres.wt <- o2req %>% 
+  group_by(WoundType, SampleType, respiration, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  filter(respiration != "NA") %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = respiration)) +
+  geom_bar(stat="identity") + facet_wrap('WoundType') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  scale_fill_manual(values = o2respal[c(1,3,5)], name = "Respiration")
+o2.allres.wt$data$SampleType <- as.character(o2.allres.wt$data$SampleType)
+o2.allres.wt$data$SampleType <- factor(o2.allres.wt$data$SampleType, levels=newSTorder)
+o2.allres.wt
+#png("o2req.stacked.box.png", width = 6, height = 6, units = "in", res = 600)
+#o2.allres
+#dev.off()
+```
+
+### Mean/SD
+```{r}
+
+# pre- vs. post- stats for counts and proportion
+ct.mean <- group_by(su.counts$data, unique) %>% summarise(mean = mean(counts))
+ct.sd <- group_by(su.counts$data, unique) %>% summarise(sd = sd(counts))
+su.ct.stat = left_join(ct.mean, ct.sd)
+su.ct.stat
+
+
+
+prop.mean <- group_by(su.prop.bar$data, unique) %>% summarise(mean = mean(proportion))
+prop.sd <- group_by(su.prop.bar$data, unique) %>% summarise(sd = sd(proportion))
+su.prop.stat = left_join(prop.mean, prop.sd)
+su.prop.stat
+
+```
+
+## Wound vs. Skin
+```{r}
+# repeat the shared/unique approach, but adapt for wound vs. skin (description column)
+
+#ps2.p5.ra <- transform_sample_counts(ps2.p5, function(x) (x / sum(x))*100 )
+ws.overlap <- psmelt(ps2.p5)
+
+# remove empty abundances
+ws.overlap <- filter(ws.overlap, Abundance != 0)
+# Calc overlap
+ws.overlap <- ws.overlap %>% 
+  group_by(OTU, Patient) %>% 
+  mutate(overlap = ifelse((n() == 1) & (Description == "Skin"), "Skin-only", 
+                      ifelse((n() <= 2) & (Description == "Wound"),
+                                 "Wound-only",
+                          ifelse((n() == 3), "Shared", "Shared"))))
+ws.overlap
+```
+
+### Counts & Proportions
+```{r}
+ws.counts <- ws.overlap %>% 
+  group_by(Patient, Description, overlap) %>%
+  summarise(counts = n()) %>%
+  ggplot(aes(x=Description, y=counts, fill = overlap)) +
+  geom_point(stat='identity', position=position_dodge(width=0.75), aes(group = overlap)) +
+  geom_boxplot() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping") +
+  theme_bw() + ylab('Per-sample OTU Counts') + xlab('Sample Type')
+newWSTorder = c("Wound-only","Skin-only","Shared")
+ws.counts$data$overlap <- as.character(ws.counts$data$overlap)
+ws.counts$data$overlap <- factor(ws.counts$data$overlap, levels=newWSTorder)
+ws.counts
+
+
+# Proportions
+ws.prop.bar <- ws.overlap %>% 
+  group_by(Patient, SampleType, overlap) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=Patient, y=proportion, fill = overlap)) +
+  geom_bar(stat='identity') + facet_grid(SampleType~.) +
+  theme_bw() + ylab("Relative Abundance") +
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping")
+ws.prop.bar$data$SampleType <- as.character(ws.prop.bar$data$SampleType)
+ws.prop.bar$data$SampleType <- factor(ws.prop.bar$data$SampleType, levels=newSTorder)
+ws.prop.bar$data$Patient <- as.character(ws.prop.bar$data$Patient)
+ws.prop.bar$data$Patient <- factor(ws.prop.bar$data$Patient, levels=newPTorder)
+ws.prop.bar$data$overlap <- as.character(ws.prop.bar$data$overlap)
+ws.prop.bar$data$overlap <- factor(ws.prop.bar$data$overlap, levels=newWSTorder)
+ws.prop.bar
+
+# bar w/ otu partitions
+ws.otu.bar <- ws.overlap %>% 
+  group_by(Patient, SampleType, overlap) %>%
+  ggplot(aes(x=Patient, y=Abundance, fill = overlap)) +
+  geom_bar(stat='identity', color = "black") + facet_grid(SampleType~.) +
+  theme_bw() +
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping")
+ws.otu.bar$data$SampleType <- as.character(ws.otu.bar$data$SampleType)
+ws.otu.bar$data$SampleType <- factor(ws.otu.bar$data$SampleType, levels=newSTorder)
+ws.otu.bar$data$Patient <- as.character(ws.otu.bar$data$Patient)
+ws.otu.bar$data$Patient <- factor(ws.otu.bar$data$Patient, levels=newPTorder)
+ws.otu.bar
+
+# genus boxplots
+ws.box.genus <- ws.overlap %>%
+  group_by(overlap, Genus) %>%
+  filter(Abundance > 0.1) %>%
+ggplot(aes(x= reorder(Genus, +Abundance), y = Abundance, fill = overlap)) +
+  geom_point(stat='identity') +
+  geom_boxplot() +
+  coord_flip() + 
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "OTU Grouping") +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Relative Abundance (%)") +
+  facet_wrap("overlap", nrow=1)
+ws.box.genus
+
+
+
+# Print & save to file
+png("overlap.ws.prop.bar.png", width = 6, height = 5, units = "in", res = 600)
+ws.prop.bar
+dev.off()
+
+png("overlap.ws.counts.png", width = 6, height = 5, units = "in", res = 600)
+ws.counts
+dev.off()
+
+png("overlap.ws.summary.png", width = 12, height = 5, units = "in", res = 600)
+grid.arrange(ws.counts, ws.prop.bar, nrow =1, ncol = 2)
+dev.off()
+
+png("overlap.ws.genusplots.png", width = 10, height = 12, units = "in", res = 600)
+ws.box.genus
+dev.off()
+```
+
+### Mean/SD
+```{r}
+ws.ct.mean <- group_by(ws.counts$data, overlap, Description) %>% summarise(mean = mean(counts))
+ws.ct.sd <- group_by(ws.counts$data, overlap, Description) %>% summarise(sd = sd(counts))
+ws.ct.stat = left_join(ws.ct.mean, ws.ct.sd)
+ws.ct.stat
+
+
+ws.prop.mean <- group_by(ws.prop.bar$data, SampleType, overlap) %>% summarise(mean = mean(proportion))
+ws.prop.sd <- group_by(ws.prop.bar$data, SampleType, overlap) %>% summarise(sd = sd(proportion))
+su.prop.stat = left_join(ws.prop.mean, ws.prop.sd)
+su.prop.stat
+```
+# Oxygen Requirement Analysis
+## Annotation
+```{r}
+# Aerobe vs. Anaerobe content
+# Label subset of taxa w/ oxygen requirements
+o2req <- filter(ps2.pfog.ggra.melt, SampleType != "Skin")
+
+#lists
+#aerobes <- c("Alcaligenes","Brevibacterium", "Corynebacterium 1", "Pseudomonas", "Staphylococcus", "Streptococcus", "Campylobacter")
+#anaerobes <- c("Anaerococcus", "Helcococcus", "Peptostreptococcus", "Porphyromonas", "Prevotella", "Veillonella", "Bacteroides","Peptoniphilus")
+#facs <- c("Proteus", "Enterobacter", "Escherichia-Shigella", "Serratia", "Enterococcus", "Propionibacterium")
+
+#lists (updated - remove low abundance annotations)
+aerobes <- c("Corynebacterium 1", "Pseudomonas", "Staphylococcus", "Streptococcus", "Campylobacter", "Rhizobium")
+anaerobes <- c("Anaerococcus", "Helcococcus", "Porphyromonas","Bacteroides","Peptoniphilus", "Peptoclostridium")
+facs <- c("Proteus", "Enterobacter", "Escherichia-Shigella", "Serratia", "Enterococcus", "Propionibacterium", "Salmonella", "Actinotignum", "Enhydrobacter")
+
+
+o2req$respiration <- ifelse(o2req$Genus %in% aerobes, "Aerobic",
+                            ifelse(o2req$Genus %in% anaerobes, "Anaerobic",
+                                   ifelse(o2req$Genus %in% facs, "Facultative", NA)))
+
+o2req
+
+o2.prop.bar <- o2req %>% 
+  group_by(Patient, SampleType, respiration) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=Patient, y=proportion, fill = respiration)) +
+  geom_bar(stat="identity") + facet_grid(SampleType~.) +
+  theme_bw() + ylab("Relative Abundance") +
+  scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete"), name = "Respiration")
+o2.prop.bar$data$Patient <- as.character(o2.prop.bar$data$Patient)
+o2.prop.bar$data$Patient <- factor(o2.prop.bar$data$Patient, levels=newPTorder)
+#o2.prop.bar$data$respiration <- as.character(o2.prop.bar$data$unique)
+#o2.prop.bar$data$respiration <- factor(o2.prop.bar$data$unique, levels=newUTorder)
+o2.prop.bar$data$SampleType <- as.character(o2.prop.bar$data$SampleType)
+o2.prop.bar$data$SampleType <- factor(o2.prop.bar$data$SampleType, levels=newSTorder)
+o2.prop.bar
+
+
+o2.boxave.genus <- o2req %>%
+  group_by(SampleType, Outcome, respiration, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = F)) %>%
+  filter(mean.abundance > 0.5) %>%
+ggplot(aes(x= reorder(Genus, +mean.abundance), y = mean.abundance, fill = respiration)) +
+  geom_bar(stat='identity')+
+  coord_flip() + 
+  #scale_fill_manual(values = wes_palette("Moonrise3", type = "discrete")) +
+  theme_bw() +
+  theme(legend.position="none") +
+  xlab("Genus") + ylab("Average Relative Abundance (%)") +
+  facet_wrap(Outcome ~ respiration, nrow=1)
+o2.boxave.genus
+png("o2.boxave.genus.png", width = 12, height = 6, units = "in", res = 400)
+o2.boxave.genus
+dev.off()
+
+```
+
+## Plots
+
+```{r}
+# Filter based on resp. system, re-plot like Kalan
+
+o2req.aero <- filter(o2req, respiration == "Aerobic")
+o2req.anaero <- filter(o2req, respiration == "Anaerobic")
+o2req.fac <- filter(o2req, respiration == "Facultative")
+
+# aerobes
+o2aeropal <- wes_palettes$Moonrise3
+o2aero.prop.bar <- o2req.aero %>% 
+  group_by(Outcome, SampleType, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Outcome') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Aerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank(),
+        text = element_text(size=13)) +
+        #legend.title = element_text(size = 8), 
+        #legend.text = element_text(size = 8),
+        #legend.key.size = unit(0.5,"cm")) +
+  guides(fill = guide_legend(title = "Aerobic\nGenera", nrow=2)) +
+  scale_fill_brewer(palette = "Accent")
+o2aero.prop.bar$data$SampleType <- as.character(o2aero.prop.bar$data$SampleType)
+o2aero.prop.bar$data$SampleType <- factor(o2aero.prop.bar$data$SampleType, levels=newSTorder)
+o2aero.prop.bar
+png("o2req.aero.png", width = 6, height = 6, units = "in", res = 600)
+o2aero.prop.bar
+dev.off()
+
+# aerobes by patient w/i healed
+o2aeropal <- wes_palettes$Moonrise3
+o2aero.prop.bar <- o2req.aero %>% 
+  group_by(Patient, Outcome, SampleType, Genus) %>%
+  filter(Outcome != "Unhealed") %>%
+  summarise(proportion = Abundance) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Patient') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Aerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+        #legend.title = element_text(size = 8), 
+        #legend.text = element_text(size = 8),
+        #legend.key.size = unit(0.5,"cm")) +
+  guides(fill = guide_legend(title = "Aerobic\nGenera", nrow=2)) +
+  scale_fill_brewer(palette = "Accent")
+o2aero.prop.bar$data$SampleType <- as.character(o2aero.prop.bar$data$SampleType)
+o2aero.prop.bar$data$SampleType <- factor(o2aero.prop.bar$data$SampleType, levels=newSTorder)
+o2aero.prop.bar
+#png("o2req.aero.bypatient.png", width = 10, height = 10, units = "in", res = 600)
+#o2aero.prop.bar
+#dev.off()
+
+# anaerobes
+o2an.prop.bar <- o2req.anaero %>% 
+  group_by(Outcome, SampleType, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Outcome') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank(),
+        text = element_text(size=13)) +
+  guides(fill = guide_legend(title = "Anaerobic\nGenera", nrow=2))
+  scale_fill_manual(values = wes_palette("Darjeeling1"))
+o2an.prop.bar$data$SampleType <- as.character(o2an.prop.bar$data$SampleType)
+o2an.prop.bar$data$SampleType <- factor(o2an.prop.bar$data$SampleType, levels=newSTorder)
+o2an.prop.bar
+png("o2.anaero.png", width = 6, height = 6, units = "in", res = 600)
+o2an.prop.bar
+dev.off()
+
+# anaerobes by patient w/i healed
+o2an.prop.bar <- o2req.anaero %>% 
+  group_by(Patient, Outcome, SampleType, Genus) %>%
+  filter(Outcome != "Unhealed") %>%
+  summarise(proportion = Abundance) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Patient') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  guides(fill = guide_legend(title = "Anaerobic\nGenera", nrow=2))
+  #scale_fill_manual(values = wes_palette("Darjeeling1"))
+o2an.prop.bar$data$SampleType <- as.character(o2an.prop.bar$data$SampleType)
+o2an.prop.bar$data$SampleType <- factor(o2an.prop.bar$data$SampleType, levels=newSTorder)
+o2an.prop.bar
+#png("o2.anaero.bypatient.png", width = 10, height = 10, units = "in", res = 600)
+#o2an.prop.bar
+#dev.off()
+
+# facultative
+#o2facpal <- wes_palettes$Darjeeling2
+#o2facpal <- colorRampPalette(o2facpal)(6)
+o2fac.prop.bar <- o2req.fac %>% 
+  group_by(Outcome, SampleType, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Outcome') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Facultative Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank(),
+        text = element_text(size=13)) +
+  guides(fill = guide_legend(title = "Facultative\nAnaerobic\nGenera", nrow=3)) +
+  scale_fill_brewer(palette = "Set1")
+o2fac.prop.bar$data$SampleType <- as.character(o2fac.prop.bar$data$SampleType)
+o2fac.prop.bar$data$SampleType <- factor(o2fac.prop.bar$data$SampleType, levels=newSTorder)
+o2fac.prop.bar
+png("o2req.fac.png", width = 6, height = 6.25, units = "in", res = 600)
+o2fac.prop.bar
+dev.off()
+
+# facultative by patient w/i Unhealed
+#o2facpal <- wes_palettes$Darjeeling2
+#o2facpal <- colorRampPalette(o2facpal)(6)
+o2fac.prop.bar <- o2req.fac %>% 
+  group_by(Patient, Outcome, SampleType, Genus) %>%
+  filter(Outcome != "Unhealed") %>%
+  summarise(proportion = Abundance) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = Genus)) +
+  geom_bar(stat="identity") + facet_wrap('Patient') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + ggtitle("Facultative Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  guides(fill = guide_legend(title = "Facultative Anaerobic\nGenera", nrow=2)) +
+  scale_fill_brewer(palette = "Set1")
+o2fac.prop.bar$data$SampleType <- as.character(o2fac.prop.bar$data$SampleType)
+o2fac.prop.bar$data$SampleType <- factor(o2fac.prop.bar$data$SampleType, levels=newSTorder)
+o2fac.prop.bar
+png("o2req.fac.bypatient.healed.png", width = 10, height = 10, units = "in", res = 600)
+o2fac.prop.bar
+dev.off()
+
+aero.outcome <- grid.arrange(o2aero.prop.bar, o2an.prop.bar, nrow = 1)
+aero.outcome
+
+png("o2req.by.outcome.png", width = 12, height = 6, units = "in", res = 600)
+grid.arrange(o2aero.prop.bar, o2an.prop.bar, o2fac.prop.bar, nrow = 1)
+dev.off()
+
+o2respal <- wes_palettes$Zissou1
+
+o2.allres <- o2req %>% 
+  group_by(Outcome, SampleType, respiration, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  filter(respiration != "") %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = respiration)) +
+  geom_bar(stat="identity") + facet_wrap('Outcome') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  scale_fill_manual(values = o2respal[c(1,3,5)], name = "Respiration")
+o2.allres$data$SampleType <- as.character(o2.allres$data$SampleType)
+o2.allres$data$SampleType <- factor(o2.allres$data$SampleType, levels=newSTorder)
+o2.allres
+png("o2req.stacked.box.png", width = 6, height = 6, units = "in", res = 600)
+o2.allres
+dev.off()
+
+o2.allres.wt <- o2req %>% 
+  group_by(WoundType, SampleType, respiration, Genus) %>%
+  summarise(proportion = mean(Abundance)) %>%
+  filter(respiration != "") %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = respiration)) +
+  geom_bar(stat="identity") + facet_wrap('WoundType') +
+  theme_bw() + ylab("Average Relative Abundance (%)") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  scale_fill_manual(values = o2respal[c(1,3,5)], name = "Respiration")
+o2.allres.wt$data$SampleType <- as.character(o2.allres.wt$data$SampleType)
+o2.allres.wt$data$SampleType <- factor(o2.allres.wt$data$SampleType, levels=newSTorder)
+o2.allres.wt
+#png("o2req.stacked.box.png", width = 6, height = 6, units = "in", res = 600)
+#o2.allres
+#dev.off()
+
+```
+
+### Stats Plots
+```{r}
+# Get stats for each of the o2 req comparisons
+
+# First make boxplots of cummulative RA of aerobes/anaerobes/facs PRE & POST
+
+# aerobes boxplot
+o2aeropal <- wes_palettes$Moonrise3
+o2aero.prop.box <- o2req.aero %>% 
+  group_by(Outcome, Patient, SampleType) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = SampleType)) +
+  geom_point() + geom_line(aes(group=Patient), colour="grey", alpha = 0.5) +
+  geom_boxplot() + 
+  facet_wrap('Outcome') +
+  theme_bw() + ylab("Relative Abundance (%)") + ggtitle("Aerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+        #legend.title = element_text(size = 8), 
+        #legend.text = element_text(size = 8),
+        #legend.key.size = unit(0.5,"cm")) +
+  guides(fill = guide_legend(title = "Sample Type", nrow=1)) +
+  scale_fill_manual(values = o2aeropal[c(1,4,2,3,5)]) +
+  stat_compare_means(method = "wilcox.test", alternative="two-sided", paired = TRUE)
+o2aero.prop.box$data$SampleType <- as.character(o2aero.prop.box$data$SampleType)
+o2aero.prop.box$data$SampleType <- factor(o2aero.prop.box$data$SampleType, levels=newSTorder)
+o2aero.prop.box
+png("o2req.aero.boxstat.png", width = 6, height = 6, units = "in", res = 600)
+o2aero.prop.box
+dev.off()
+
+
+# anaerobes boxplot
+o2an.prop.box <- o2req.anaero %>% 
+  group_by(Outcome, Patient, SampleType) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=SampleType, y=proportion, fill = SampleType)) +
+  geom_point() + geom_line(aes(group=Patient), colour="grey", alpha = 0.5) +
+  geom_boxplot() + 
+  facet_wrap('Outcome') +
+  theme_bw() + ylab("Relative Abundance (%)") + ggtitle("Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  guides(fill = guide_legend(title = "SampleType", nrow=1)) +
+  scale_fill_manual(values = wes_palette("Darjeeling1")) +
+  stat_compare_means(method = "wilcox.test", alternative="two-sided", paired = TRUE)
+o2an.prop.box$data$SampleType <- as.character(o2an.prop.box$data$SampleType)
+o2an.prop.box$data$SampleType <- factor(o2an.prop.box$data$SampleType, levels=newSTorder)
+o2an.prop.box
+png("o2.anaero.boxstat.png", width = 6, height = 6, units = "in", res = 600)
+o2an.prop.box
+dev.off()
+
+
+# facs boxplot
+o2fac.prop.box <- o2req.fac %>% 
+  group_by(Outcome, Patient, SampleType) %>%
+  summarise(proportion = sum(Abundance)) %>%
+  ggplot(aes(x=Outcome, y=proportion, fill = Outcome)) +
+  geom_point() +  geom_line(aes(group=Patient), colour="grey", alpha = 0.5) +
+  geom_boxplot() + 
+  #facet_wrap('Outcome') +
+  theme_bw() + ylab("Relative Abundance (%)") + ggtitle("Facultative Anaerobes") + 
+  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+  guides(fill = guide_legend(title = "Sample Type", nrow=1)) +
+  scale_fill_brewer(palette = "Dark2") +
+  stat_compare_means(method = "wilcox.test", alternative="two-sided", aes(group = Outcome))
+o2fac.prop.box$data$SampleType <- as.character(o2fac.prop.box$data$SampleType)
+o2fac.prop.box$data$SampleType <- factor(o2fac.prop.box$data$SampleType, levels=newSTorder)
+o2fac.prop.box
+png("o2req.fac.boxstat.png", width = 6, height = 6, units = "in", res = 600)
+o2fac.prop.box
+dev.off()
+
+# this is the cummulative RA stacked bar
+#o2.allres <- o2req %>% 
+#  group_by(Outcome, SampleType, respiration, Genus) %>%
+#  summarise(proportion = mean(Abundance)) %>%
+#  filter(respiration != "") %>%
+#  ggplot(aes(x=SampleType, y=proportion, fill = respiration)) +
+#  geom_bar(stat="identity") + facet_wrap('Outcome') +
+#  theme_bw() + ylab("Average Relative Abundance (%)") + 
+#  theme(legend.position = "bottom", axis.title.x = element_blank()) +
+#  scale_fill_manual(values = o2respal[c(1,3,5)], name = "Respiration")
+#o2.allres$data$SampleType <- as.character(o2.allres$data$SampleType)
+#o2.allres$data$SampleType <- factor(o2.allres$data$SampleType, levels=newSTorder)
+#o2.allres
+#png("o2req.stacked.box.png", width = 6, height = 6, units = "in", res = 600)
+#o2.allres
+#dev.off()
+```
+### Stat Tables
+
+```{r}
+# collect mean & sd for each plot
+a.dat <- o2aero.prop.box$data
+a.mean <- group_by(a.dat, Outcome, SampleType) %>% summarise(a.mean = mean(proportion))
+a.sd <- group_by(a.dat, Outcome, SampleType) %>% summarise(a.sd = sd(proportion))
+a.stat = left_join(a.mean, a.sd)
+a.comp = compare_means(proportion ~ SampleType, a.dat, method = "wilcox.test", paired = TRUE, group.by = "Outcome", alternative = "two.sided")
+a.comp
+
+an.dat <- o2an.prop.box$data
+an.mean <- group_by(an.dat, Outcome, SampleType) %>% summarise(an.mean = mean(proportion))
+an.sd <- group_by(an.dat, Outcome, SampleType) %>% summarise(an.sd = sd(proportion))
+an.stat = left_join(an.mean, an.sd)
+an.comp = compare_means(proportion ~ SampleType, an.dat, method = "wilcox.test", paired = TRUE, group.by = "Outcome", alternative = "two.sided")
+an.comp
+
+f.dat <- o2fac.prop.box$data
+f.mean <- group_by(f.dat, Outcome) %>% summarise(f.mean = mean(proportion))
+f.sd <- group_by(f.dat, Outcome) %>% summarise(f.sd = sd(proportion))
+f.stat = left_join(f.mean, f.sd)
+f.stat
+fac.comp = compare_means(proportion ~ Outcome, f.dat, method = "wilcox.test", paired = FALSE, alternative = "two.sided")
+fac.comp
+
+o2req.stat = left_join(a.stat, an.stat)
+#o2req.stat = left_join(o2req.stat, f.stat)
+o2req.stat
+```
+# KS Test for Facultative variance
+```{r}
+f.dat
+fligner.test(proportion ~ Outcome, data = f.dat)
+bartlett.test(proportion ~ Outcome, data = f.dat)
+ks.test(f.dat$Outcome, f.dat$proportion, alternative - "two.sided")
+
+```
+
+# Taxonomic dotplot by outcome, colored by O2 Req
+```{r}
+
+all.ann <- c("Corynebacterium 1", "Pseudomonas", "Staphylococcus", "Streptococcus", "Campylobacter","Anaerococcus", "Helcococcus", "Porphyromonas","Bacteroides","Peptoniphilus","Peptoclostridium","Proteus", "Enterobacter", "Escherichia-Shigella", "Serratia", "Enterococcus", "Propionibacterium", "Morganella", "Salmonella")
+
+# Dot plot grouped by outcome
+wo1 = o2req %>% filter(SampleType != "Skin" & Outcome != "") %>% group_by(respiration, Outcome, Genus) %>%
+  summarise(mean.abundance = mean(Abundance, na.rm = T)) %>%
+  filter(mean.abundance > 0.5) %>%
+  filter(Genus %in% all.ann) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(aes(y=reorder(Genus, desc(Genus)), x=Outcome,
+                 size = mean.abundance, color = respiration)) +
+  scale_size_continuous(range = c(2,15), name = "Average Relative\nAbundance") +
+  theme_classic() + xlab("Outcome") +
+  scale_color_manual(values = wes_palette("Darjeeling1"), name = "Respiration") +
+  theme(legend.position = "right") + ylab("Genus")
+wo1
+
+png("taxa.dotplot.outcome.draft.png", width = 5, height = 6, units = "in", res = 600)
+wo1
+dev.off()
+```
+
+

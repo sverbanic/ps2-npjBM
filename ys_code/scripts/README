@@ -1,0 +1,7 @@
+This is a directory for various scripts being used for the PSII project
+
+- `paper_figures.ipynb`: Jupyter notebook for some paper figures, including
+  - Model results from BGLMM and DESeq2
+  - SI: OTU picking pipeline quality control
+  - SI: pre-filter table OTU composition
+  - SI: Significant OTU composition (from BGLMM and DESeq2) in original otu table
